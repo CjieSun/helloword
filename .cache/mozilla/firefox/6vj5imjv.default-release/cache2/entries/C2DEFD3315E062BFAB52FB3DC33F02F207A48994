@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="0.11.1 (2b48ae40ea1b)" />
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+<link rel="icon" href="/9.0.0_r3/default/img/icon.png" type="image/png" />
+<link rel="stylesheet" type="text/css" media="all"
+    title="Default" href="/9.0.0_r3/default/style.css" />
+<link rel="alternate stylesheet" type="text/css" media="all"
+    title="Paper White" href="/9.0.0_r3/default/print.css" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/jquery.tooltip.css" />
+
+<link rel="search" href="/9.0.0_r3/opensearch"
+    type="application/opensearchdescription+xml"
+    title="OpenGrok Search for current project(s)" />
+<script type="text/javascript" src="/9.0.0_r3/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/9.0.0_r3/jquery.tooltip-1.3.pack.js"></script>
+
+<script type="text/javascript" src="/9.0.0_r3/utils.js"></script>
+<title>Search</title>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      var pluginUrl = 
+      '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+      _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+      _gaq.push(['_setAccount', 'UA-37941318-1']);
+      _gaq.push(['_setDomainName', 'androidxref.com']);
+      _gaq.push(['_trackPageview']);
+      
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();      
+    </script>
+</head><body>
+<div id="page">
+    <div id="whole_header">
+        <div id="header">
+<a href="/9.0.0_r3/"><span id="MastheadLogo"></span></a>
+
+
+
+        </div>
+        <div id="Masthead"></div>
+        <div id="bar">
+            <ul>
+                <li><a href="/9.0.0_r3/"><span id="home"></span>Home</a></li>
+            </ul>
+            
+            <div id="sortfield">
+                <label for="sortby">Sort by</label>
+                <ul id="sortby"><li><a href="search?&amp;path=procrank&amp;project=art%2Cbionic%2Cbootable%2Cbuild%2Ccompatibility%2Ccts%2Cdalvik%2Cdevelopers%2Cdevelopment%2Cdevice%2Cexternal%2Cframeworks%2Chardware%2Ckernel%2Clibcore%2Clibnativehelper%2Cpackages%2Cpdk%2Cplatform_testing%2Cprebuilts%2Csdk%2Csystem%2Ctest%2Ctoolchain%2Ctools&amp;sort=lastmodtime">last modified time</a></li><li><span class="active">relevance</span></li><li><a href="search?&amp;path=procrank&amp;project=art%2Cbionic%2Cbootable%2Cbuild%2Ccompatibility%2Ccts%2Cdalvik%2Cdevelopers%2Cdevelopment%2Cdevice%2Cexternal%2Cframeworks%2Chardware%2Ckernel%2Clibcore%2Clibnativehelper%2Cpackages%2Cpdk%2Cplatform_testing%2Cprebuilts%2Csdk%2Csystem%2Ctest%2Ctoolchain%2Ctools&amp;sort=fullpath">path</a></li></ul>
+            </div>
+        </div>
+        <div id="menu">
+<script type="text/javascript">/* <![CDATA[ */
+    document.projects = [ 'art','bionic','bootable','build','compatibility','cts','dalvik','developers','development','device','external','frameworks','hardware','kernel','libcore','libnativehelper','packages','pdk','platform_testing','prebuilts','sdk','system','test','toolchain','tools' ];document.xrefPath = '/9.0.0_r3/xref';document.domReady.push(function() { domReadyMenu(); });
+/* ]]> */
+</script>
+<form action="search" id="sbox">
+
+<div id="qtbl">
+<table>
+    <tr>
+        <td><label for="s1">Full&nbsp;Search</label></td>
+        <td><input tabindex="1" class="q" name="q" id="q" value=""/></td>
+    </tr>
+    <tr>
+        <td><label for="s2">Definition</label></td>
+        <td><input class="q" tabindex="2" name="defs" id="defs" value=""/></td>
+    </tr>
+    <tr>
+        <td><label for="s3">Symbol</label></td>
+        <td><input class="q" tabindex="3" name="refs" id="refs" value=""/></td>
+    </tr>
+    <tr>
+        <td><label for="s4">File&nbsp;Path</label></td>
+        <td><input class="q" tabindex="4" name="path" id="path" value="procrank"/></td>
+    </tr>
+    <tr>
+        <td><label for="s5">History</label></td>
+        <td><input class="q" tabindex="5" name="hist" id="hist" value=""/></td>
+    </tr>
+
+</table>
+</div>
+<div id="ptbl">
+    <p><label for="project">In Project(s)</label> <button tabindex="6" type="button"
+        onclick="javascript: selectAllProjects(); return false;"
+        >select all</button>&nbsp;<button tabindex="7" type="button"
+        onclick="javascript: invertAllProjects(); return false;"
+        >invert selection</button> </p>
+    <select tabindex="8" ondblclick="javascript: goFirstProject();"
+        onkeyup="javascript: checkEnter(event);" class="q" id="project"
+        name="project" multiple="multiple" size="6">
+        <option value="art" selected="selected">art</option>
+        <option value="bionic" selected="selected">bionic</option>
+        <option value="bootable" selected="selected">bootable</option>
+        <option value="build" selected="selected">build</option>
+        <option value="compatibility" selected="selected">compatibility</option>
+        <option value="cts" selected="selected">cts</option>
+        <option value="dalvik" selected="selected">dalvik</option>
+        <option value="developers" selected="selected">developers</option>
+        <option value="development" selected="selected">development</option>
+        <option value="device" selected="selected">device</option>
+        <option value="external" selected="selected">external</option>
+        <option value="frameworks" selected="selected">frameworks</option>
+        <option value="hardware" selected="selected">hardware</option>
+        <option value="kernel" selected="selected">kernel</option>
+        <option value="libcore" selected="selected">libcore</option>
+        <option value="libnativehelper" selected="selected">libnativehelper</option>
+        <option value="packages" selected="selected">packages</option>
+        <option value="pdk" selected="selected">pdk</option>
+        <option value="platform_testing" selected="selected">platform_testing</option>
+        <option value="prebuilts" selected="selected">prebuilts</option>
+        <option value="sdk" selected="selected">sdk</option>
+        <option value="system" selected="selected">system</option>
+        <option value="test" selected="selected">test</option>
+        <option value="toolchain" selected="selected">toolchain</option>
+        <option value="tools" selected="selected">tools</option>
+    </select>
+</div>
+
+<p><input
+    tabindex="9" class="submit" type="submit" value="Search"/> <input
+    tabindex="10" class="submit" onclick="javascript: clearSearchFrom();" type="button"
+    value=" Clear "/> <button class="help"
+    tabindex="11" onclick="window.open('help.jsp')">Help</button>
+</p>
+</form>
+
+
+        </div>
+    </div>
+    <div id="results">
+        <p class="pagetitle">Searched <b>path:procrank</b> (Results <b> 1 - 6</b> of <b>6</b>) sorted by relevance</p>
+        <table><tr class="dir"><td colspan="3"><a href="/9.0.0_r3/xref/system/extras/procrank/">/system/extras/procrank/</a></td></tr><tr><td class="q"><a href="/9.0.0_r3/history/system/extras/procrank/procrank.cpp" title="History">H</a> <a href="/9.0.0_r3/xref/system/extras/procrank/procrank.cpp?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/system/extras/procrank/procrank.cpp" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/system/extras/procrank/procrank.cpp">procrank.cpp</a></td><td><tt class="con"></tt></td></tr>
+<tr><td class="q"><a href="/9.0.0_r3/history/system/extras/procrank/MODULE_LICENSE_APACHE2" title="History">H</a> <a href="/9.0.0_r3/xref/system/extras/procrank/MODULE_LICENSE_APACHE2?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/system/extras/procrank/MODULE_LICENSE_APACHE2" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/system/extras/procrank/MODULE_LICENSE_APACHE2">MODULE_LICENSE_APACHE2</a></td><td><tt class="con"></tt></td></tr>
+<tr><td class="q"><a href="/9.0.0_r3/history/system/extras/procrank/NOTICE" title="History">H</a> <a href="/9.0.0_r3/xref/system/extras/procrank/NOTICE?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/system/extras/procrank/NOTICE" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/system/extras/procrank/NOTICE">NOTICE</a></td><td><tt class="con"></tt></td></tr>
+<tr><td class="q"><a href="/9.0.0_r3/history/system/extras/procrank/Android.mk" title="History">H</a> <a href="/9.0.0_r3/xref/system/extras/procrank/Android.mk?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/system/extras/procrank/Android.mk" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/system/extras/procrank/Android.mk">Android.mk</a></td><td><tt class="con"></tt></td></tr>
+<tr class="dir"><td colspan="3"><a href="/9.0.0_r3/xref/frameworks/base/cmds/incident_helper/testdata/">/frameworks/base/cmds/incident_helper/testdata/</a></td></tr><tr><td class="q"><a href="/9.0.0_r3/history/frameworks/base/cmds/incident_helper/testdata/procrank.txt" title="History">H</a> <a href="/9.0.0_r3/xref/frameworks/base/cmds/incident_helper/testdata/procrank.txt?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/frameworks/base/cmds/incident_helper/testdata/procrank.txt" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/frameworks/base/cmds/incident_helper/testdata/procrank.txt">procrank.txt</a></td><td><tt class="con"></tt></td></tr>
+<tr class="dir"><td colspan="3"><a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/os/">/frameworks/base/core/proto/android/os/</a></td></tr><tr><td class="q"><a href="/9.0.0_r3/history/frameworks/base/core/proto/android/os/procrank.proto" title="History">H</a> <a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/os/procrank.proto?a=true" title="Annotate">A</a> <a href="/9.0.0_r3/raw/frameworks/base/core/proto/android/os/procrank.proto" title="Download">D</a></td><td class="f"><a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/os/procrank.proto">procrank.proto</a></td><td><tt class="con"></tt></td></tr>
+
+        </table>
+        <p><b>Completed in 244 milliseconds</b></p>
+    </div>
+    <div id="footer">
+<p><a href="http://www.opensolaris.org/os/project/opengrok/"
+ title="Served by OpenGrok"><span id="fti"></span></a></p>
+<p>Indexes created Sun Aug 12 02:23:12 CEST 2018</p>
+    
+    
+    </div>
+</div>
+</body>
+</html>
+
+tìÔ©À           `0þàB¬¿`0þà      O^partitionKey=%28http%2Candroidxref.com%29,:http://androidxref.com/9.0.0_r3/search?q=&defs=&refs=&path=procrank&hist=&project=art&project=bionic&project=bootable&project=build&project=compatibility&project=cts&project=dalvik&project=developers&project=development&project=device&project=external&project=frameworks&project=hardware&project=kernel&project=libcore&project=libnativehelper&project=packages&project=pdk&project=platform_testing&project=prebuilts&project=sdk&project=system&project=test&project=toolchain&project=tools strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Content-Type: text/html;charset=UTF-8
+Date: Sat, 20 Feb 2021 12:21:51 GMT
+ original-response-headers Server: Apache-Coyote/1.1
+Set-Cookie: OpenGrokProject="art,bionic,bootable,build,compatibility,cts,dalvik,developers,development,device,external,frameworks,hardware,kernel,libcore,libnativehelper,packages,pdk,platform_testing,prebuilts,sdk,system,test,toolchain,tools"; Version=1
+Set-Cookie: OpenGrokSorting=relevancy
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sat, 20 Feb 2021 12:21:51 GMT
+ ctid 1 uncompressed-len 0   *@

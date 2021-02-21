@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="0.11.1 (2b48ae40ea1b)" />
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+<link rel="icon" href="/9.0.0_r3/default/img/icon.png" type="image/png" />
+<link rel="stylesheet" type="text/css" media="all"
+    title="Default" href="/9.0.0_r3/default/style.css" />
+<link rel="alternate stylesheet" type="text/css" media="all"
+    title="Paper White" href="/9.0.0_r3/default/print.css" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/jquery.tooltip.css" />
+
+<link rel="search" href="/9.0.0_r3/opensearch"
+    type="application/opensearchdescription+xml"
+    title="OpenGrok Search for current project(s)" />
+<script type="text/javascript" src="/9.0.0_r3/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/9.0.0_r3/jquery.tooltip-1.3.pack.js"></script>
+
+<script type="text/javascript" src="/9.0.0_r3/utils.js"></script>
+<title>Cross Reference: /frameworks/base/core/proto/android/util/common.proto</title>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      var pluginUrl = 
+      '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+      _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+      _gaq.push(['_setAccount', 'UA-37941318-1']);
+      _gaq.push(['_setDomainName', 'androidxref.com']);
+      _gaq.push(['_trackPageview']);
+      
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();      
+    </script>
+</head><body>
+<script type="text/javascript">/* <![CDATA[ */
+    document.hash = 'null';document.rev = '';document.link = '/9.0.0_r3/xref/frameworks/base/core/proto/android/util/common.proto';document.annotate = false;
+    document.domReady.push(function() {domReadyMast();});
+    document.pageReady.push(function() { pageReadyMast();});
+/* ]]> */</script>
+<div id="page">
+    <div id="whole_header">
+        <form action="/9.0.0_r3/search">
+<div id="header">
+<a href="/9.0.0_r3/"><span id="MastheadLogo"></span></a>
+
+
+
+    <div id="pagetitle"><span id="filename"
+                    >Cross Reference: common.proto</span></div>
+</div>
+<div id="Masthead">
+    <tt><a href="/9.0.0_r3/xref/">xref</a>: /<a href="/9.0.0_r3/xref/frameworks/">frameworks</a>/<a href="/9.0.0_r3/xref/frameworks/base/">base</a>/<a href="/9.0.0_r3/xref/frameworks/base/core/">core</a>/<a href="/9.0.0_r3/xref/frameworks/base/core/proto/">proto</a>/<a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/">android</a>/<a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/util/">util</a>/<a href="/9.0.0_r3/xref/frameworks/base/core/proto/android/util/common.proto">common.proto</a></tt>
+</div>
+<div id="bar">
+    <ul>
+        <li><a href="/9.0.0_r3/"><span id="home"></span>Home</a></li><li><a href="/9.0.0_r3/history/frameworks/base/core/proto/android/util/common.proto"><span id="history"></span>History</a></li><li><a href="#" onclick="javascript:get_annotations(); return false;"
+            ><span class="annotate"></span>Annotate</a></li><li><a href="#" onclick="javascript:lntoggle();return false;"
+            title="Show or hide line numbers (might be slower if file has more than 10 000 lines)."><span id="line"></span>Line#</a></li><li><a
+            href="#" onclick="javascript:lsttoggle();return false;"
+            title="Show or hide symbol list."><span id="defbox"></span>Navigate</a></li><li><a href="/9.0.0_r3/raw/frameworks/base/core/proto/android/util/common.proto"><span id="download"></span>Download</a></li><li><input type="text" id="search" name="q" class="q" />
+            <input type="submit" value="Search" class="submit" /></li><li><input type="checkbox" name="path" value="/frameworks/base/core/proto/android/util/" /> only in <b>common.proto</b></li>
+        
+    </ul>
+    <input type="hidden" name="project" value="frameworks" />
+</div>
+        </form>
+    </div>
+<div id="content">
+<script type="text/javascript">/* <![CDATA[ */
+document.pageReady.push(function() { pageReadyList();});
+/* ]]> */</script>
+
+<div id="src">
+    <pre><script type="text/javascript">/* <![CDATA[ */
+function get_sym_list(){return [];} /* ]]> */</script><a class="l" name="1" href="#1">1</a><span class="c">/*
+<a class="l" name="2" href="#2">2</a> * Copyright (C) 2017 The Android Open Source Project
+<a class="l" name="3" href="#3">3</a> *
+<a class="l" name="4" href="#4">4</a> * Licensed under the Apache License, Version 2.0 (the "License");
+<a class="l" name="5" href="#5">5</a> * you may not use this file except in compliance with the License.
+<a class="l" name="6" href="#6">6</a> * You may obtain a copy of the License at
+<a class="l" name="7" href="#7">7</a> *
+<a class="l" name="8" href="#8">8</a> *      <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
+<a class="l" name="9" href="#9">9</a> *
+<a class="hl" name="10" href="#10">10</a> * Unless required by applicable law or agreed to in writing, software
+<a class="l" name="11" href="#11">11</a> * distributed under the License is distributed on an "AS IS" BASIS,
+<a class="l" name="12" href="#12">12</a> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+<a class="l" name="13" href="#13">13</a> * See the License for the specific language governing permissions and
+<a class="l" name="14" href="#14">14</a> * limitations under the License.
+<a class="l" name="15" href="#15">15</a> */</span>
+<a class="l" name="16" href="#16">16</a>
+<a class="l" name="17" href="#17">17</a><a href="/9.0.0_r3/s?defs=syntax&amp;project=frameworks">syntax</a> = <span class="s">"proto2"</span>;
+<a class="l" name="18" href="#18">18</a><b>package</b> <a href="/9.0.0_r3/s?defs=android&amp;project=frameworks">android</a>.<a href="/9.0.0_r3/s?defs=util&amp;project=frameworks">util</a>;
+<a class="l" name="19" href="#19">19</a>
+<a class="hl" name="20" href="#20">20</a><b>import</b> <span class="s">"<a href="/9.0.0_r3/s?path=frameworks/">frameworks</a>/<a href="/9.0.0_r3/s?path=frameworks/base/">base</a>/<a href="/9.0.0_r3/s?path=frameworks/base/libs/">libs</a>/<a href="/9.0.0_r3/s?path=frameworks/base/libs/incident/">incident</a>/<a href="/9.0.0_r3/s?path=frameworks/base/libs/incident/proto/">proto</a>/<a href="/9.0.0_r3/s?path=frameworks/base/libs/incident/proto/android/">android</a>/<a href="/9.0.0_r3/s?path=frameworks/base/libs/incident/proto/android/privacy.proto">privacy.proto</a>"</span>;
+<a class="l" name="21" href="#21">21</a>
+<a class="l" name="22" href="#22">22</a><a href="/9.0.0_r3/s?defs=option&amp;project=frameworks">option</a> <a href="/9.0.0_r3/s?defs=java_multiple_files&amp;project=frameworks">java_multiple_files</a> = <b>true</b>;
+<a class="l" name="23" href="#23">23</a>
+<a class="l" name="24" href="#24">24</a><span class="c">/**
+<a class="l" name="25" href="#25">25</a> * Very basic data structure used by aggregated stats.
+<a class="l" name="26" href="#26">26</a> */</span>
+<a class="l" name="27" href="#27">27</a><a href="/9.0.0_r3/s?defs=message&amp;project=frameworks">message</a> <a href="/9.0.0_r3/s?defs=AggStats&amp;project=frameworks">AggStats</a> {
+<a class="l" name="28" href="#28">28</a>    <a href="/9.0.0_r3/s?defs=option&amp;project=frameworks">option</a> (<a href="/9.0.0_r3/s?defs=android&amp;project=frameworks">android</a>.<a href="/9.0.0_r3/s?defs=msg_privacy&amp;project=frameworks">msg_privacy</a>).<a href="/9.0.0_r3/s?defs=dest&amp;project=frameworks">dest</a> = <a href="/9.0.0_r3/s?defs=DEST_AUTOMATIC&amp;project=frameworks">DEST_AUTOMATIC</a>;
+<a class="l" name="29" href="#29">29</a>
+<a class="hl" name="30" href="#30">30</a>    <a href="/9.0.0_r3/s?defs=optional&amp;project=frameworks">optional</a> <a href="/9.0.0_r3/s?defs=int64&amp;project=frameworks">int64</a> <a href="/9.0.0_r3/s?defs=min&amp;project=frameworks">min</a> = <span class="n">1</span>;
+<a class="l" name="31" href="#31">31</a>
+<a class="l" name="32" href="#32">32</a>    <a href="/9.0.0_r3/s?defs=optional&amp;project=frameworks">optional</a> <a href="/9.0.0_r3/s?defs=int64&amp;project=frameworks">int64</a> <a href="/9.0.0_r3/s?defs=average&amp;project=frameworks">average</a> = <span class="n">2</span>;
+<a class="l" name="33" href="#33">33</a>
+<a class="l" name="34" href="#34">34</a>    <a href="/9.0.0_r3/s?defs=optional&amp;project=frameworks">optional</a> <a href="/9.0.0_r3/s?defs=int64&amp;project=frameworks">int64</a> <a href="/9.0.0_r3/s?defs=max&amp;project=frameworks">max</a> = <span class="n">3</span>;
+<a class="l" name="35" href="#35">35</a>}
+<a class="l" name="36" href="#36">36</a>
+<a class="l" name="37" href="#37">37</a><span class="c">/**
+<a class="l" name="38" href="#38">38</a> * Very basic data structure to represent Duration.
+<a class="l" name="39" href="#39">39</a> */</span>
+<a class="hl" name="40" href="#40">40</a><a href="/9.0.0_r3/s?defs=message&amp;project=frameworks">message</a> <a href="/9.0.0_r3/s?defs=Duration&amp;project=frameworks">Duration</a> {
+<a class="l" name="41" href="#41">41</a>    <a href="/9.0.0_r3/s?defs=option&amp;project=frameworks">option</a> (<a href="/9.0.0_r3/s?defs=android&amp;project=frameworks">android</a>.<a href="/9.0.0_r3/s?defs=msg_privacy&amp;project=frameworks">msg_privacy</a>).<a href="/9.0.0_r3/s?defs=dest&amp;project=frameworks">dest</a> = <a href="/9.0.0_r3/s?defs=DEST_AUTOMATIC&amp;project=frameworks">DEST_AUTOMATIC</a>;
+<a class="l" name="42" href="#42">42</a>
+<a class="l" name="43" href="#43">43</a>    <a href="/9.0.0_r3/s?defs=optional&amp;project=frameworks">optional</a> <a href="/9.0.0_r3/s?defs=int64&amp;project=frameworks">int64</a> <a href="/9.0.0_r3/s?defs=start_ms&amp;project=frameworks">start_ms</a> = <span class="n">1</span>;
+<a class="l" name="44" href="#44">44</a>
+<a class="l" name="45" href="#45">45</a>    <a href="/9.0.0_r3/s?defs=optional&amp;project=frameworks">optional</a> <a href="/9.0.0_r3/s?defs=int64&amp;project=frameworks">int64</a> <a href="/9.0.0_r3/s?defs=end_ms&amp;project=frameworks">end_ms</a> = <span class="n">2</span>;
+<a class="l" name="46" href="#46">46</a>}</pre>
+</div>
+    <div id="footer">
+<p><a href="http://www.opensolaris.org/os/project/opengrok/"
+ title="Served by OpenGrok"><span id="fti"></span></a></p>
+<p>Indexes created Sun Aug 12 02:23:12 CEST 2018</p>
+    
+    </div>
+    </div>
+</div>
+</body>
+</html>
+
+³?E·S&      `0þ¬`0þ­B¬¾è`:9+   †    O^partitionKey=%28http%2Candroidxref.com%29,:http://androidxref.com/9.0.0_r3/xref/frameworks/base/core/proto/android/util/common.proto necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Last-Modified: Fri, 10 Aug 2018 10:37:53 GMT
+Content-Type: text/html;charset=UTF-8
+Date: Sat, 20 Feb 2021 12:21:00 GMT
+ original-response-headers Server: Apache-Coyote/1.1
+Last-Modified: Fri, 10 Aug 2018 10:37:53 GMT
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sat, 20 Feb 2021 12:21:00 GMT
+ ctid 1 uncompressed-len 0 net-response-time-onstart 377 net-response-time-onstop 690   *ª

@@ -1,0 +1,20 @@
+[
+    {
+        "app_id": "io.snapcraft.thincast-client-SA6kjdPJEREO9H26ZUI58SGbnLSmVz5S",
+        "date_created": 1613630929.0,
+        "description": "Seems like it can understand and authenticate with the RDP server but will be stuck in a connection loop",
+        "distro": "Ubuntu",
+        "karma_down": 0,
+        "karma_up": 0,
+        "locale": "en_AU.UTF-8",
+        "rating": 40,
+        "reported": 0,
+        "review_id": 342346,
+        "score": 51,
+        "summary": "Doesn't work",
+        "user_display": "Ori",
+        "user_hash": "518aeae94fcd8feefd146d38843ae0a6faab2d0e",
+        "user_skey": "a7a9c40a6f572251cf4cc18d804aab308df58400",
+        "version": "1.0.118"
+    }
+]

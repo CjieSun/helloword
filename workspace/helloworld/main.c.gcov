@@ -1,0 +1,19 @@
+        -:    0:Source:main.c
+        -:    0:Graph:main.gcno
+        -:    0:Data:main.gcda
+        -:    0:Runs:1
+        -:    1:#include <stdio.h>
+        -:    2:
+    #####:    3:int func(void)
+        -:    4:{
+    #####:    5:	printf("This func is not called\n");
+    #####:    6:	return 0;
+        -:    7:}
+        -:    8:
+        1:    9:int main(void)
+        -:   10:{
+        -:   11:	int c;
+        1:   12:	c = 1 + 2;
+        1:   13:	printf("1 + 2 = %d\n", c);
+        1:   14:	return 0;
+        -:   15:}

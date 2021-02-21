@@ -1,0 +1,1290 @@
+HT = new function () {
+    // *******************************************************
+    // begin: variables
+    // *******************************************************
+
+    // *******************************************************
+    // begin: variables.constants
+    // *******************************************************
+
+    // constant values: start with an underscore (_)
+    var _closeTimer = 100;
+    var _requestTimer = 500;
+    var _showLoadingTime = 1000;
+    var _popupClassname = "hts_pop";
+    var _popupWindowId = "ht_pop";
+    var _popupContentId = "ht_content";
+    var _popupFooterId = "ht_footer";
+    var _popScriptId = "ht_popscript";
+    var _requeryLinkId = "ht_requeryLink";
+    var _wordSeperator = "@";
+    var spanTemplate = "<i>$1</i>";
+    var _federationTimeout = 2500;
+    var _contentArea = _ge("b_content");
+    // *******************************************************
+    // end: variables.constants
+    // *******************************************************
+
+    // global variables: start with a dollar sign ($)
+    var $activePopup = null;
+    var $config = sa_HTConfig;
+    var $srcSpan = null;
+    var $requestStartTime = null;
+    var $requestTimer = null;
+    var $closeTimer = null;
+    var $showLoadingTimer = null;
+    var $federationTimer = null;
+    var $cache = [];
+    var $ignoreClassNames = ($config && $config.sIgnCls) ? $config.sIgnCls.split("|") : null ;
+    var $hovertransToggle = "ht_toggle";
+    var $hovertransToggleTab = "ev_hover_trans_btn";
+    var $stateOn = true;
+    var $htCookieName= ($config && $config.sCook) ? $config.sCook : "_FP";
+    var $crumbName = ($config && $config.sQryKey) ? $config.sQryKey : "hta";
+    var $quickSearchPatch = true;
+
+    // *******************************************************
+    // end: variables
+    // *******************************************************
+
+    function AddSpanForWords(node)
+    {
+        //Filter out some DOM element should not be changed
+        if ((node.tagName == "SCRIPT") || node.tagName == "STYLE" || node.tagName == "CITE" || node.tagName == "text" || node.getAttribute && node.getAttribute("hover-trans") && node.getAttribute("hover-trans") == "no")
+        {
+            return;
+        }
+
+        if(node.className && node.className.split && $ignoreClassNames )
+        {
+            var nodeClassNames = node.className.split(" ");
+            for(var i=0; i<$ignoreClassNames.length;i++)
+            {
+                for(var j=0;j<nodeClassNames.length;j++)
+                {
+                    if($ignoreClassNames[i] == nodeClassNames[j])
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
+        //Iterate the DOM to add span for each word
+        var childrens = node.childNodes;
+        if (childrens.length == 0)
+        {
+            if (NeedProcessNode(node))
+            {
+                var newContent = node.nodeValue.replace(/(\b(\w|-|'|\u2019)*[A-Za-z](\w|-|'|\u2019)*\b)/ig, spanTemplate);
+                newElement = _d.createElement("i");
+                newElement.innerHTML = newContent;
+
+                var parentNode = node.parentNode;
+                if (newElement.childNodes.length == 1 && parentNode.nodeName == 'I' && parentNode.parentNode.nodeName == 'I')
+                {
+                    parentNode.onmouseover = parentNode.onmouseout = function (evt) { spanHandler(evt, this); };
+                }
+                else
+                {
+                    if ((sb_ie) && (newContent.charAt(0) == " "))
+                    {
+                        tempElement = document.createTextNode(" ");
+                        newElement.insertBefore(tempElement, newElement.childNodes[0]);
+                    }
+
+                    node.parentNode.replaceChild(newElement, node);
+                    //Attach event for spans
+                    var childList = newElement.childNodes;
+                    for (var i = 0; i < childList.length; i++)
+                    {
+                        if (childList[i].nodeName == 'I')
+                        {
+                            childList[i].onmouseover = childList[i].onmouseout = function (evt) { spanHandler(evt, this); };
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (var i = 0; i < childrens.length; i++)
+            {
+                AddSpanForWords(childrens[i]);
+            }
+        }
+    }
+
+    function NeedProcessNode(node)
+    {
+        var sw=/^\s*$/;
+        return (node && (node.nodeName == "#text") && !sw.test(node.nodeValue))
+    }
+
+    function updateToggleText(toggle)
+    {
+        if(toggle)
+        {
+            toggle.innerHTML= $stateOn? $config.sOff : $config.sOn;
+        }
+    }
+
+    function stateChangeHandler(evt,obj)
+    {
+        //change the state
+        $stateOn= ! $stateOn;
+
+        //set cookie
+        sj_cook.set($htCookieName,$crumbName,$stateOn?"on":"off" ,1);
+
+        //change toggle string
+        updateToggleText(obj);
+    }
+
+    this.closeHoverBox = function ()
+    {
+        hidePopup();
+        var toggle= _ge($hovertransToggle);
+        var toggle_tab = _ge($hovertransToggleTab);
+
+        if(toggle && toggle.onclick)
+        {
+            toggle.onclick(null);
+            return false;
+        }
+        else if (toggle_tab) {
+            toggle_tab.click();
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    function spanHandler(evt, span)
+    {
+        if(!$stateOn)
+            return;
+        
+        // get cross-browser event type
+        var e = sj_ev(evt);
+        var evtType = e.type;
+
+        if ("mouseout" == evtType)
+        {
+            if ($srcSpan)
+                spanMouseOut();
+        }
+        else
+        {
+            if ("mouseover" == evtType)
+            {
+                hoverElement = sj_et(e);
+                if ($quickSearchPatch && conflictWithQuickSearch(hoverElement))
+                    return;
+
+                $srcSpan = hoverElement;
+                //clear closerTimer is it exist
+                if ($closeTimer)
+                {
+                    sb_ct($closeTimer);
+                }
+
+                //set show timer
+                $requestTimer = sb_st(function ()
+                {
+                    requsetTranslation();
+                }, _requestTimer);
+
+                $srcSpan.setAttribute('class', $srcSpan.getAttribute('class') + ' hover_target');
+            }
+        }
+    }
+
+    function conflictWithQuickSearch(evtElement) {
+        // for quick search. if selected, dont show hover translation.
+        var selection = window.getSelection();
+        if (selection.toString()) {
+            if (selection.containsNode) {
+                return selection.containsNode(evtElement, true);
+            }
+        }
+        return false;
+    }
+
+    function bodyKeyUpMouseUpHandler(evt) {
+        if ($srcSpan && $stateOn && conflictWithQuickSearch($srcSpan)) {
+            spanMouseOut();
+        }
+    }
+
+    function spanMouseOut() {
+        //clear request timer if it exist
+        if ($requestTimer) {
+            sb_ct($requestTimer);
+        }
+
+        if ($showLoadingTimer) {
+            sb_ct($showLoadingTimer);
+        }
+
+        if ($federationTimer) {
+            sb_ct($federationTimer);
+        }
+
+        // set timer to close pop up
+        $closeTimer = sb_st(function () {
+            if ($activePopup) hidePopup();
+        }, _closeTimer);
+
+        var cssArray = $srcSpan.getAttribute('class').split(' ');
+        var cssres = '';
+        for (var cname in cssArray) {
+            if (cname != 'hover_target') {
+                cssres += cname;
+            }
+        }
+        $srcSpan.setAttribute('class', cssres);
+        $srcSpan = null;
+    }
+
+    function popupHandler(evt)
+    {
+
+        // get cross-browser event type
+        var e = sj_ev(evt);
+        var evtType = e.type;
+
+        if ("mouseout" == evtType)
+        {
+            // set timer to close pop up
+            $closeTimer = sb_st(function ()
+            {
+                hidePopup();
+            }, _closeTimer);
+        }
+        else
+        {
+            if ("mouseover" == evtType)
+            {
+                //clear closerTimer is it exist
+                if ($closeTimer)
+                {
+                    sb_ct($closeTimer);
+                }
+            }
+        }
+    }
+
+    function hidePopup()
+    {
+        if (_ge(_popupWindowId).style.display != 'none')
+        {
+            _ge(_popupWindowId).style.display = 'none';
+            HT.Hide(_ge(_popupWindowId).word);
+        }
+    }
+
+    this.Hide = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    function requsetTranslation()
+    {
+        var word = $srcSpan.innerHTML;
+        $activePopup.word = word;
+        //generate popup footer
+        var moreUrl = $config.sMoUrl.replace("{0}", word);
+        var logoLink = "<span id='ht_logo'></span>";
+        var downloadLink = '<a href="https://bingdict.chinacloudsites.cn/" target="_blank" class="ht_download">' + $config.sDeskTop + '</a>';
+        var closeLink = '<a href="'+ $config.sOffUrl +'" onclick="return HT.closeHoverBox();" class="ht_close">' + $config.sHoverOff + '</a>';
+
+
+        var resHTML = logoLink + closeLink + downloadLink;
+        _ge(_popupFooterId).innerHTML = resHTML;
+
+        //Check cache first
+        if ($cache[word] && (typeof ($cache[word]) == "string"))
+        {
+            _ge(_popupContentId).innerHTML = $cache[word];
+            $activePopup.style.display = "block";
+            positionWindow();
+            return;
+        }
+
+        //Set Timeout to show loading window
+        $showLoadingTimer = sb_st(function ()
+        {
+            showLoadingWindow();
+        }, _showLoadingTime);
+
+        //Remove previous js if exists
+        var js = _ge(_popScriptId)
+        if (js)
+        {
+            sj_b.removeChild(js);
+        }
+
+        $requestStartTime = new Date();
+        //Inject a js after content to send request
+        HT.Request($srcSpan.innerHTML);
+        var url = $config.uBase.replace(/&amp;/g, '&').concat(word);
+        var ajax = sj_gx();
+
+        ajax.open("GET", url, true);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    popupHTML = ajax.responseText;
+                    ht_apply(word, popupHTML);
+                }
+                else {
+                    federationTimeOut($srcSpan.innerHTML);
+                }
+            }
+        }
+
+        ajax.send();
+    }
+
+    this.Show = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    this.Request = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    function showLoadingWindow()
+    {
+        //show "Loading..." message
+        _ge(_popupContentId).innerHTML = $config.sLod;
+        $activePopup.style.display = "block";
+
+        positionWindow();
+    }
+
+    function federationTimeOut(word)
+    {
+        HT.TimeOut(word);
+        var js = _ge(_popScriptId);
+        if (js)
+        {
+            sj_b.removeChild(js);
+        }
+        _ge(_popupContentId).innerHTML = $config.sFto;
+        positionWindow();
+    }
+
+    this.TimeOut = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    // return the actual width of the window in pixels or -1 if browser not compliant
+    function getWindowWidth()
+    {
+        var wWidth = -1;
+        // use documentElement.clientWidth as document.innerWidth includes the vertical scrollbar
+        if (sb_de && sb_de.clientWidth)
+        {
+            wWidth = sb_de.clientWidth;
+        }
+        return wWidth;
+    }
+
+    // return the actual height of the window in pixels or -1 if browser not compliant
+    function getWindowHeight()
+    {
+        var wHeight = -1;
+        // Non-IE
+        if (typeof (_w.innerHeight) == 'number')
+        {
+            wHeight = _w.innerHeight;
+        }
+            // IE 6+ in 'standards compliant mode'
+        else if (sb_de && sb_de.clientHeight)
+        {
+            wHeight = sb_de.clientHeight;
+        }
+        return wHeight;
+    }
+
+    // return scroll amount in pixels or 0 if browser not compliant
+    function getScrollY()
+    {
+        var scrOfY = 0;
+        // Netscape compliant
+        if (typeof (_w.pageYOffset) == 'number')
+        {
+            scrOfY = _w.pageYOffset;
+        }
+            // DOM compliant
+        else if (sj_b && sj_b.scrollTop)
+        {
+            scrOfY = sj_b.scrollTop;
+        }
+            // IE6 standards compliant mode
+        else if (sb_de && sb_de.scrollTop)
+        {
+            scrOfY = sb_de.scrollTop;
+        }
+
+        return scrOfY;
+    }
+
+    function getPosition(o)
+    {
+        var x = sj_go(o, "Left");
+        var top = sj_go(o, "Top");
+        var y = top + o.offsetHeight;
+        var screenW = getWindowWidth();
+        var screenH = getWindowHeight();
+        var scorllX = sb_de.scrollLeft;
+        var scrollY = getScrollY();
+        var oW = parseInt($activePopup.clientWidth);
+        var oH = parseInt($activePopup.clientHeight);
+        if ((x + oW) > (screenW + scorllX))
+        {
+            var x1 = screenW + scorllX - oW - 10;
+            x = (x1 > 0) ? x1 : x;
+        }
+        if ((y + oH) > (screenH + scrollY))
+        {
+            var y1 = top - oH - 2;
+            y = (y1 > 0) ? y1 : y;
+        }
+        return { x: x, y: y };
+    }
+
+    function positionWindow()
+    {
+        var pos = getPosition($srcSpan);
+        $activePopup.style.left = pos.x + "px";
+        $activePopup.style.top = pos.y + "px";
+    }
+
+    function isIE() {
+        var myNav = navigator.userAgent.toLowerCase();
+        var ieVersion = (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false
+        if (ieVersion)
+            return ieVersion;
+        ieVersion = myNav.indexOf('trident') != -1 ? parseInt(myNav.split('rv:')[0]) : false;
+        if (ieVersion)
+            return ieVersion
+        return false;
+    }
+
+    this.Init = function ()
+    {
+        //check the cookie
+        var $tempState = sj_cook.get($htCookieName,$crumbName);
+        if($tempState==null)
+            $stateOn=true;
+        if($tempState)
+        {
+            $stateOn = ($tempState=="on");
+        }
+        else
+        {
+            sj_cook.set($htCookieName,$crumbName, $stateOn?"on":"off", 1);
+        }
+        // if in bing51visual, do not reload the page when click the toggle
+        var toggle = _ge($hovertransToggle);
+        if(toggle)
+        {
+            toggle.onclick= function(evt){stateChangeHandler(evt,this);sj_sp(evt);return false;}
+        }
+
+        //Parse the document and add span for English word
+        AddSpanForWords(_contentArea);
+
+        $activePopup = _ge(_popupWindowId);
+
+        if (!$activePopup)
+        {
+            //Create popup div
+            $activePopup = sj_ce("div", _popupWindowId, _popupClassname);
+            $activePopup.setAttribute("data-priority", "2");
+            $activePopup.appendChild(sj_ce("div", _popupContentId, 0));
+            var footer = sj_ce("div", _popupFooterId, 0);
+            $activePopup.appendChild(footer);
+            $activePopup.onmouseover = $activePopup.onmouseout = function (evt) { popupHandler(evt); };
+            sj_b.appendChild($activePopup);
+        }
+        else
+        {
+            $activePopup.onmouseover = $activePopup.onmouseout = function (evt) { popupHandler(evt); };
+        }
+
+        var ieVersion = isIE();
+        if (ieVersion) {
+            $quickSearchPatch = false;
+        }
+
+        if ($quickSearchPatch) {
+            sj_be(_d, "keyup", bodyKeyUpMouseUpHandler);
+            sj_be(_d, "mouseup", bodyKeyUpMouseUpHandler);
+        }
+    }
+
+    this.Apply = function (word, translation)
+    {
+        if ($federationTimer)
+        {
+            sb_ct($federationTimer);
+        }
+        if ($showLoadingTimer)
+        {
+            sb_ct($showLoadingTimer);
+        }
+        var now = new Date();
+        HT.Success(word, now - $requestStartTime);
+        if (translation)
+        {
+            //Fill in the translation result to popup content
+            var title = $config.sIsEnSearch && $config.sIsEnSearch == 'true' ? word : '<a href="' + $config.sMoUrl.replace("{0}", word) + '" target="_blank" onclick="HT.MoreLinkClick();">' + word + '</a>';
+            var moreLink = '<h4>' + title + '</h4>';
+            translation = translation.replace("<span id=\"ht_logo\"></span>", "").replace("<h4>" + word + "</h4>", moreLink);
+            var decodeTranslation = decodeURI(translation);
+            if ($cache[word] == undefined)
+            {
+                $cache[word] = decodeTranslation;
+            }
+            _ge(_popupContentId).innerHTML = decodeTranslation;
+
+        }
+        else
+        {
+            //No result, show the no-result message
+            _ge(_popupContentId).innerHTML = "<div><h4 style='margin-right:10'>" + word + "</h4><div>" + $config.sNrst + "</div></div>";
+            //footer no changed
+            //_ge(_popupFooterId).innerHTML = "";
+        }
+        if ($srcSpan) {
+            $activePopup.style.display = "block";
+            positionWindow();
+        }
+    }
+
+    this.Success = function (word, duration)
+    {
+        // declared as public for instrumentation
+    }
+
+    this.MoreLinkClick = function ()
+    {
+        // declared as public for instrumentation
+    }
+
+    this.TurnOffLinkClick = function ()
+    {
+        // declared as public for instrumentation
+        hidePopup();
+    }
+
+    this.RequeryLinkClick = function ()
+    {
+        // declared as public for instrumentation
+    }
+
+    this.Disable = function ()
+    {
+        $stateOn = false;
+    }
+
+    this.Enable = function ()
+    {
+        $stateOn = true;
+    }
+}
+
+function ht_apply(word, translation)
+{
+    HT.Apply(word, translation);
+}
+
+HT.Init();
+
+sj_evt.bind("htInit", function () {
+    HT.Init();
+});
+
+sj_evt.bind("htDisable", function () {
+    HT.Disable();
+});
+
+sj_evt.bind("htEnable", function () {
+    HT.Enable();
+});        20210204182252-8l1…      ht_apply   HT   HT<   _popupFooterId#   $quickSearchPatch#   $ignoreClassNames   NeedProcessNode   $srcSpan   spanHandler   $stateOn#   showLoadingWindow   $closeTimer!   $federationTimer   _closeTimer   _popupClassname)   $hovertransToggleTab!   _showLoadingTime   _requeryLinkId   getWindowWidth%   requsetTranslation   getPosition#   $requestStartTime   _wordSeperator   $htCookieName   _contentArea   spanMouseOut   _requestTimer   popupHandler!   updateToggleText   getScrollY   $cache   spanTemplate   $requestTimer   getWindowHeight/   bodyKeyUpMouseUpHandler   _popupContentId#   federationTimeOut#   $hovertransToggle   _popupWindowId/   conflictWithQuickSearch   hidePopup   $activePopup	   isIE   $config%   _federationTimeout   $crumbName#   $showLoadingTimer%   stateChangeHandler   positionWindow   .this   _popScriptId   AddSpanForWords	   word	   ajax   hts_pop   ht_pop   ht_content   ht_footer   ht_popscript   ht_requeryLink   @   <i>$1</i>   _ge   b_content   sa_HTConfig   sIgnCls   split   |   ht_toggle%   ev_hover_trans_btn   sCook   _FP   sQryKey   hta-   HT</this.closeHoverBox   closeHoverBox   HT</this.Hide	   Hide   HT</this.Show	   Show!   HT</this.Request   Request!   HT</this.TimeOut   TimeOut   HT</this.Init	   Init   HT</this.Apply   Apply!   HT</this.Success   Success-   HT</this.MoreLinkClick   MoreLinkClick3   HT</this.TurnOffLinkClick!   TurnOffLinkClick3   HT</this.RequeryLinkClick!   RequeryLinkClick!   HT</this.Disable   Disable   HT</this.Enable   Enable   sj_evt	   bind   htInit   htDisable   htEnable   $tempState   toggle   footer   ieVersion   sj_cook   get   on   set   off9   HT</this.Init/toggle.onclick   onclick   sj_ce   div   setAttribute   data-priority   2   appendChildK   HT</this.Init/$activePopup.onmouseout   onmouseout   onmouseover	   sj_b   sj_be   _d   keyup   mouseup	   node   nodeClassNames   i   j   childrens   newContent   parentNode   childList   tagName   SCRIPT   STYLE	   CITE	   text   getAttribute   hover-trans   no   className       length   childNodes   nodeValue   replace]   (\b(\w|-|'|\u2019)*[A-Za-z](\w|-|'|\u2019)*\b)   newElement   createElement   innerHTML   nodeName   IK   AddSpanForWords/parentNode.onmouseout   sb_ie   charAt   tempElement   document   createTextNode   insertBefore   replaceChildO   AddSpanForWords/childList[i].onmouseout   sw   ^\s*$   #text	   test   myNav   navigator   userAgent   toLowerCase   indexOf	   msie   parseInt   trident   rv:   evt	   span   e   evtType   sj_ev	   type   mouseout   mouseover   hoverElement   sj_et   sb_ct   sb_st5   spanHandler/$requestTimer<   class    hover_target   evtElement   selection   window   getSelection   toString   containsNode    oI      oI         ¿  oI  HT = new function () {
+    // *******************************************************
+    // begin: variables
+    // *******************************************************
+
+    // *******************************************************
+    // begin: variables.constants
+    // *******************************************************
+
+    // constant values: start with an underscore (_)
+    var _closeTimer = 100;
+    var _requestTimer = 500;
+    var _showLoadingTime = 1000;
+    var _popupClassname = "hts_pop";
+    var _popupWindowId = "ht_pop";
+    var _popupContentId = "ht_content";
+    var _popupFooterId = "ht_footer";
+    var _popScriptId = "ht_popscript";
+    var _requeryLinkId = "ht_requeryLink";
+    var _wordSeperator = "@";
+    var spanTemplate = "<i>$1</i>";
+    var _federationTimeout = 2500;
+    var _contentArea = _ge("b_content");
+    // *******************************************************
+    // end: variables.constants
+    // *******************************************************
+
+    // global variables: start with a dollar sign ($)
+    var $activePopup = null;
+    var $config = sa_HTConfig;
+    var $srcSpan = null;
+    var $requestStartTime = null;
+    var $requestTimer = null;
+    var $closeTimer = null;
+    var $showLoadingTimer = null;
+    var $federationTimer = null;
+    var $cache = [];
+    var $ignoreClassNames = ($config && $config.sIgnCls) ? $config.sIgnCls.split("|") : null ;
+    var $hovertransToggle = "ht_toggle";
+    var $hovertransToggleTab = "ev_hover_trans_btn";
+    var $stateOn = true;
+    var $htCookieName= ($config && $config.sCook) ? $config.sCook : "_FP";
+    var $crumbName = ($config && $config.sQryKey) ? $config.sQryKey : "hta";
+    var $quickSearchPatch = true;
+
+    // *******************************************************
+    // end: variables
+    // *******************************************************
+
+    function AddSpanForWords(node)
+    {
+        //Filter out some DOM element should not be changed
+        if ((node.tagName == "SCRIPT") || node.tagName == "STYLE" || node.tagName == "CITE" || node.tagName == "text" || node.getAttribute && node.getAttribute("hover-trans") && node.getAttribute("hover-trans") == "no")
+        {
+            return;
+        }
+
+        if(node.className && node.className.split && $ignoreClassNames )
+        {
+            var nodeClassNames = node.className.split(" ");
+            for(var i=0; i<$ignoreClassNames.length;i++)
+            {
+                for(var j=0;j<nodeClassNames.length;j++)
+                {
+                    if($ignoreClassNames[i] == nodeClassNames[j])
+                    {
+                        return;
+                    }
+                }
+            }
+        }
+
+        //Iterate the DOM to add span for each word
+        var childrens = node.childNodes;
+        if (childrens.length == 0)
+        {
+            if (NeedProcessNode(node))
+            {
+                var newContent = node.nodeValue.replace(/(\b(\w|-|'|\u2019)*[A-Za-z](\w|-|'|\u2019)*\b)/ig, spanTemplate);
+                newElement = _d.createElement("i");
+                newElement.innerHTML = newContent;
+
+                var parentNode = node.parentNode;
+                if (newElement.childNodes.length == 1 && parentNode.nodeName == 'I' && parentNode.parentNode.nodeName == 'I')
+                {
+                    parentNode.onmouseover = parentNode.onmouseout = function (evt) { spanHandler(evt, this); };
+                }
+                else
+                {
+                    if ((sb_ie) && (newContent.charAt(0) == " "))
+                    {
+                        tempElement = document.createTextNode(" ");
+                        newElement.insertBefore(tempElement, newElement.childNodes[0]);
+                    }
+
+                    node.parentNode.replaceChild(newElement, node);
+                    //Attach event for spans
+                    var childList = newElement.childNodes;
+                    for (var i = 0; i < childList.length; i++)
+                    {
+                        if (childList[i].nodeName == 'I')
+                        {
+                            childList[i].onmouseover = childList[i].onmouseout = function (evt) { spanHandler(evt, this); };
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (var i = 0; i < childrens.length; i++)
+            {
+                AddSpanForWords(childrens[i]);
+            }
+        }
+    }
+
+    function NeedProcessNode(node)
+    {
+        var sw=/^\s*$/;
+        return (node && (node.nodeName == "#text") && !sw.test(node.nodeValue))
+    }
+
+    function updateToggleText(toggle)
+    {
+        if(toggle)
+        {
+            toggle.innerHTML= $stateOn? $config.sOff : $config.sOn;
+        }
+    }
+
+    function stateChangeHandler(evt,obj)
+    {
+        //change the state
+        $stateOn= ! $stateOn;
+
+        //set cookie
+        sj_cook.set($htCookieName,$crumbName,$stateOn?"on":"off" ,1);
+
+        //change toggle string
+        updateToggleText(obj);
+    }
+
+    this.closeHoverBox = function ()
+    {
+        hidePopup();
+        var toggle= _ge($hovertransToggle);
+        var toggle_tab = _ge($hovertransToggleTab);
+
+        if(toggle && toggle.onclick)
+        {
+            toggle.onclick(null);
+            return false;
+        }
+        else if (toggle_tab) {
+            toggle_tab.click();
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
+    function spanHandler(evt, span)
+    {
+        if(!$stateOn)
+            return;
+        
+        // get cross-browser event type
+        var e = sj_ev(evt);
+        var evtType = e.type;
+
+        if ("mouseout" == evtType)
+        {
+            if ($srcSpan)
+                spanMouseOut();
+        }
+        else
+        {
+            if ("mouseover" == evtType)
+            {
+                hoverElement = sj_et(e);
+                if ($quickSearchPatch && conflictWithQuickSearch(hoverElement))
+                    return;
+
+                $srcSpan = hoverElement;
+                //clear closerTimer is it exist
+                if ($closeTimer)
+                {
+                    sb_ct($closeTimer);
+                }
+
+                //set show timer
+                $requestTimer = sb_st(function ()
+                {
+                    requsetTranslation();
+                }, _requestTimer);
+
+                $srcSpan.setAttribute('class', $srcSpan.getAttribute('class') + ' hover_target');
+            }
+        }
+    }
+
+    function conflictWithQuickSearch(evtElement) {
+        // for quick search. if selected, dont show hover translation.
+        var selection = window.getSelection();
+        if (selection.toString()) {
+            if (selection.containsNode) {
+                return selection.containsNode(evtElement, true);
+            }
+        }
+        return false;
+    }
+
+    function bodyKeyUpMouseUpHandler(evt) {
+        if ($srcSpan && $stateOn && conflictWithQuickSearch($srcSpan)) {
+            spanMouseOut();
+        }
+    }
+
+    function spanMouseOut() {
+        //clear request timer if it exist
+        if ($requestTimer) {
+            sb_ct($requestTimer);
+        }
+
+        if ($showLoadingTimer) {
+            sb_ct($showLoadingTimer);
+        }
+
+        if ($federationTimer) {
+            sb_ct($federationTimer);
+        }
+
+        // set timer to close pop up
+        $closeTimer = sb_st(function () {
+            if ($activePopup) hidePopup();
+        }, _closeTimer);
+
+        var cssArray = $srcSpan.getAttribute('class').split(' ');
+        var cssres = '';
+        for (var cname in cssArray) {
+            if (cname != 'hover_target') {
+                cssres += cname;
+            }
+        }
+        $srcSpan.setAttribute('class', cssres);
+        $srcSpan = null;
+    }
+
+    function popupHandler(evt)
+    {
+
+        // get cross-browser event type
+        var e = sj_ev(evt);
+        var evtType = e.type;
+
+        if ("mouseout" == evtType)
+        {
+            // set timer to close pop up
+            $closeTimer = sb_st(function ()
+            {
+                hidePopup();
+            }, _closeTimer);
+        }
+        else
+        {
+            if ("mouseover" == evtType)
+            {
+                //clear closerTimer is it exist
+                if ($closeTimer)
+                {
+                    sb_ct($closeTimer);
+                }
+            }
+        }
+    }
+
+    function hidePopup()
+    {
+        if (_ge(_popupWindowId).style.display != 'none')
+        {
+            _ge(_popupWindowId).style.display = 'none';
+            HT.Hide(_ge(_popupWindowId).word);
+        }
+    }
+
+    this.Hide = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    function requsetTranslation()
+    {
+        var word = $srcSpan.innerHTML;
+        $activePopup.word = word;
+        //generate popup footer
+        var moreUrl = $config.sMoUrl.replace("{0}", word);
+        var logoLink = "<span id='ht_logo'></span>";
+        var downloadLink = '<a href="https://bingdict.chinacloudsites.cn/" target="_blank" class="ht_download">' + $config.sDeskTop + '</a>';
+        var closeLink = '<a href="'+ $config.sOffUrl +'" onclick="return HT.closeHoverBox();" class="ht_close">' + $config.sHoverOff + '</a>';
+
+
+        var resHTML = logoLink + closeLink + downloadLink;
+        _ge(_popupFooterId).innerHTML = resHTML;
+
+        //Check cache first
+        if ($cache[word] && (typeof ($cache[word]) == "string"))
+        {
+            _ge(_popupContentId).innerHTML = $cache[word];
+            $activePopup.style.display = "block";
+            positionWindow();
+            return;
+        }
+
+        //Set Timeout to show loading window
+        $showLoadingTimer = sb_st(function ()
+        {
+            showLoadingWindow();
+        }, _showLoadingTime);
+
+        //Remove previous js if exists
+        var js = _ge(_popScriptId)
+        if (js)
+        {
+            sj_b.removeChild(js);
+        }
+
+        $requestStartTime = new Date();
+        //Inject a js after content to send request
+        HT.Request($srcSpan.innerHTML);
+        var url = $config.uBase.replace(/&amp;/g, '&').concat(word);
+        var ajax = sj_gx();
+
+        ajax.open("GET", url, true);
+        ajax.onreadystatechange = function () {
+            if (ajax.readyState == 4) {
+                if (ajax.status == 200) {
+                    popupHTML = ajax.responseText;
+                    ht_apply(word, popupHTML);
+                }
+                else {
+                    federationTimeOut($srcSpan.innerHTML);
+                }
+            }
+        }
+
+        ajax.send();
+    }
+
+    this.Show = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    this.Request = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    function showLoadingWindow()
+    {
+        //show "Loading..." message
+        _ge(_popupContentId).innerHTML = $config.sLod;
+        $activePopup.style.display = "block";
+
+        positionWindow();
+    }
+
+    function federationTimeOut(word)
+    {
+        HT.TimeOut(word);
+        var js = _ge(_popScriptId);
+        if (js)
+        {
+            sj_b.removeChild(js);
+        }
+        _ge(_popupContentId).innerHTML = $config.sFto;
+        positionWindow();
+    }
+
+    this.TimeOut = function (word)
+    {
+        // declared as public for instrumentation
+    }
+
+    // return the actual width of the window in pixels or -1 if browser not compliant
+    function getWindowWidth()
+    {
+        var wWidth = -1;
+        // use documentElement.clientWidth as document.innerWidth includes the vertical scrollbar
+        if (sb_de && sb_de.clientWidth)
+        {
+            wWidth = sb_de.clientWidth;
+        }
+        return wWidth;
+    }
+
+    // return the actual height of the window in pixels or -1 if browser not compliant
+    function getWindowHeight()
+    {
+        var wHeight = -1;
+        // Non-IE
+        if (typeof (_w.innerHeight) == 'number')
+        {
+            wHeight = _w.innerHeight;
+        }
+            // IE 6+ in 'standards compliant mode'
+        else if (sb_de && sb_de.clientHeight)
+        {
+            wHeight = sb_de.clientHeight;
+        }
+        return wHeight;
+    }
+
+    // return scroll amount in pixels or 0 if browser not compliant
+    function getScrollY()
+    {
+        var scrOfY = 0;
+        // Netscape compliant
+        if (typeof (_w.pageYOffset) == 'number')
+        {
+            scrOfY = _w.pageYOffset;
+        }
+            // DOM compliant
+        else if (sj_b && sj_b.scrollTop)
+        {
+            scrOfY = sj_b.scrollTop;
+        }
+            // IE6 standards compliant mode
+        else if (sb_de && sb_de.scrollTop)
+        {
+            scrOfY = sb_de.scrollTop;
+        }
+
+        return scrOfY;
+    }
+
+    function getPosition(o)
+    {
+        var x = sj_go(o, "Left");
+        var top = sj_go(o, "Top");
+        var y = top + o.offsetHeight;
+        var screenW = getWindowWidth();
+        var screenH = getWindowHeight();
+        var scorllX = sb_de.scrollLeft;
+        var scrollY = getScrollY();
+        var oW = parseInt($activePopup.clientWidth);
+        var oH = parseInt($activePopup.clientHeight);
+        if ((x + oW) > (screenW + scorllX))
+        {
+            var x1 = screenW + scorllX - oW - 10;
+            x = (x1 > 0) ? x1 : x;
+        }
+        if ((y + oH) > (screenH + scrollY))
+        {
+            var y1 = top - oH - 2;
+            y = (y1 > 0) ? y1 : y;
+        }
+        return { x: x, y: y };
+    }
+
+    function positionWindow()
+    {
+        var pos = getPosition($srcSpan);
+        $activePopup.style.left = pos.x + "px";
+        $activePopup.style.top = pos.y + "px";
+    }
+
+    function isIE() {
+        var myNav = navigator.userAgent.toLowerCase();
+        var ieVersion = (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1]) : false
+        if (ieVersion)
+            return ieVersion;
+        ieVersion = myNav.indexOf('trident') != -1 ? parseInt(myNav.split('rv:')[0]) : false;
+        if (ieVersion)
+            return ieVersion
+        return false;
+    }
+
+    this.Init = function ()
+    {
+        //check the cookie
+        var $tempState = sj_cook.get($htCookieName,$crumbName);
+        if($tempState==null)
+            $stateOn=true;
+        if($tempState)
+        {
+            $stateOn = ($tempState=="on");
+        }
+        else
+        {
+            sj_cook.set($htCookieName,$crumbName, $stateOn?"on":"off", 1);
+        }
+        // if in bing51visual, do not reload the page when click the toggle
+        var toggle = _ge($hovertransToggle);
+        if(toggle)
+        {
+            toggle.onclick= function(evt){stateChangeHandler(evt,this);sj_sp(evt);return false;}
+        }
+
+        //Parse the document and add span for English word
+        AddSpanForWords(_contentArea);
+
+        $activePopup = _ge(_popupWindowId);
+
+        if (!$activePopup)
+        {
+            //Create popup div
+            $activePopup = sj_ce("div", _popupWindowId, _popupClassname);
+            $activePopup.setAttribute("data-priority", "2");
+            $activePopup.appendChild(sj_ce("div", _popupContentId, 0));
+            var footer = sj_ce("div", _popupFooterId, 0);
+            $activePopup.appendChild(footer);
+            $activePopup.onmouseover = $activePopup.onmouseout = function (evt) { popupHandler(evt); };
+            sj_b.appendChild($activePopup);
+        }
+        else
+        {
+            $activePopup.onmouseover = $activePopup.onmouseout = function (evt) { popupHandler(evt); };
+        }
+
+        var ieVersion = isIE();
+        if (ieVersion) {
+            $quickSearchPatch = false;
+        }
+
+        if ($quickSearchPatch) {
+            sj_be(_d, "keyup", bodyKeyUpMouseUpHandler);
+            sj_be(_d, "mouseup", bodyKeyUpMouseUpHandler);
+        }
+    }
+
+    this.Apply = function (word, translation)
+    {
+        if ($federationTimer)
+        {
+            sb_ct($federationTimer);
+        }
+        if ($showLoadingTimer)
+        {
+            sb_ct($showLoadingTimer);
+        }
+        var now = new Date();
+        HT.Success(word, now - $requestStartTime);
+        if (translation)
+        {
+            //Fill in the translation result to popup content
+            var title = $config.sIsEnSearch && $config.sIsEnSearch == 'true' ? word : '<a href="' + $config.sMoUrl.replace("{0}", word) + '" target="_blank" onclick="HT.MoreLinkClick();">' + word + '</a>';
+            var moreLink = '<h4>' + title + '</h4>';
+            translation = translation.replace("<span id=\"ht_logo\"></span>", "").replace("<h4>" + word + "</h4>", moreLink);
+            var decodeTranslation = decodeURI(translation);
+            if ($cache[word] == undefined)
+            {
+                $cache[word] = decodeTranslation;
+            }
+            _ge(_popupContentId).innerHTML = decodeTranslation;
+
+        }
+        else
+        {
+            //No result, show the no-result message
+            _ge(_popupContentId).innerHTML = "<div><h4 style='margin-right:10'>" + word + "</h4><div>" + $config.sNrst + "</div></div>";
+            //footer no changed
+            //_ge(_popupFooterId).innerHTML = "";
+        }
+        if ($srcSpan) {
+            $activePopup.style.display = "block";
+            positionWindow();
+        }
+    }
+
+    this.Success = function (word, duration)
+    {
+        // declared as public for instrumentation
+    }
+
+    this.MoreLinkClick = function ()
+    {
+        // declared as public for instrumentation
+    }
+
+    this.TurnOffLinkClick = function ()
+    {
+        // declared as public for instrumentation
+        hidePopup();
+    }
+
+    this.RequeryLinkClick = function ()
+    {
+        // declared as public for instrumentation
+    }
+
+    this.Disable = function ()
+    {
+        $stateOn = false;
+    }
+
+    this.Enable = function ()
+    {
+        $stateOn = true;
+    }
+}
+
+function ht_apply(word, translation)
+{
+    HT.Apply(word, translation);
+}
+
+HT.Init();
+
+sj_evt.bind("htInit", function () {
+    HT.Init();
+});
+
+sj_evt.bind("htDisable", function () {
+    HT.Disable();
+});
+
+sj_evt.bind("htEnable", function () {
+    HT.Enable();
+});  ?   https://cn.bing.com/s/as/18929812/MsnJVData/HoverTranslation.js   ≥!´!Ä!´!ˇˇˇˇ             å!´!ç!´!    	 †     hH  £H  WH  £H  ^            5ûé!´!   å!´!ç!´!      †       SH  	   SH        BB   ≥!´!å!´!ˇˇˇˇ1                     	   
+                                                                      !   "   #   $   %   &   '   (   )   *   +   ,   -   .   /   0   1   2   3           å!´!ç!´!     † 3    §  ˚  å  ˚  2       $   ≥!´!å!´!ˇˇˇˇ   Ç   É   Ñ   Ö   Ü   á   à   â          é!´!ä   é!´!ã   é!´!å   é!´!ç   é!´!é   é!´!è   é!´!ê   é!´!ë   é!´!í   é!´!B   é!´!ì   é!´!î   é!´!ï   é!´!ñ   é!´!ó   å!´!å!´!ò   é!´!ô   é!´!   é!´!ö   é!´!Ñ   é!´!õ   é!´!à   é!´!ú   é!´!ù   å!´!ç!´!    	 †û   ¢  √  ô  √  V   N         5ûé!´!{   é!´!|   é!´!ü   é!´!†   é!´!°   é!´!¢   é!´!£   é!´!§   é!´!•   å!´!ç!´!     †¶   …  Í  ¿  Í  g   Z       ≥!´!å!´!ˇˇˇˇ   ¥   1          öò;¯                                   ”√   ‘∏    ∂  ∑   s ‘ü&`P-P$P  5ûöò;¯D                             w    ∂  F      óû   ë   ‘∂  F      óÖ   ë   ‘∂  F      ól   ë	   ‘∂  F      óS   ë   ‘∂  F   ñ@   ë   ‘∂  ÷F   Ÿ   o ñ#   ë   ‘∂  ÷F   Ÿ   o    ë   î   ë    úë   ∂  F	   ñ(   ë   ‘∂  F	   F
+   ñ   ë   ‘∏   ë   îΩ   ë   ∂  F	   ÷F
+   Ÿ   o √   ‘√  ‘í   ∑  ∏   F   î|   ë!   √  ‘í!   ∑  ∑   F   îA   ë$   ∏   ∑  G∑   ∑  Gî   ë(    úë(   ∑  .÷'√  ‘‘ì∞ˇˇˇë*   ∑  .÷'√  ‘‘ìtˇˇˇë,   ∂  F   √  ‘∑  F   î  ë0   ∏    ∂  o îˇ  ë2   ∂  F   ÷F   Ÿe   ∏   o √  ‘≤   µ   ÷F   Ÿ   o ¿   ‘µ   ∑  H   ‘∂  F   √  ‘µ   F   F   ñ9   ëB   ‘∑  F      ñ   ëE   ‘∑  F   F      ëH   î'   ëI   ∑  ∑  f   H   H   ‘ì(  ëK   µ   ñ    ëM   ‘∑  ÷F   Ÿo    ëP   îJ   ëQ   ≤   µ   ÷F    Ÿ   o ¿   ‘µ   ÷F!   Ÿµ   µ   F   Gs ‘ë]   ∂  F   ÷F"   Ÿµ   ∂  s ‘µ   F   √  ‘√  ‘íc   ∑  ∑  F   îa   ëf   ∑  ∑  GF      î,   ëj   ∑  ∑  G∑  ∑  Gf#   H   H   ‘ën   ∑  .÷'√  ‘‘ìêˇˇˇëp   ìS   ëp   √  ‘íp   ∑  ∑  F   î/   ës   ∏ .   ∑  ∑  Gs ‘∑  .÷'√  ‘‘ì¬ˇˇˇëw   ü0@ `Pˇ'Ä  ÜPù $Pò00 `PAB F `Pø00 !`Pî P8  `P&fPô00  `P&fPò00 `Pû00 `PAB F 4`Pó@ 4`Pó@ `P= `Pï00 `P)P=0 !`Pô P8 `Pñ P9 `PO! !`P= `PŸ00 `P¢@'0 `Pú Pò00 `Pñ P9 `Pù PI. `Pó PD0 $`P?  `P&fPò00 `Pû00 `Pß@1 :`P°@<0  `P&fPò00 `P/PD= 2`Pó@B P         H  U          #  ë          q  u          ˚  C    5ûå!´!ç!´!     †      ô    ô  v           ≥!´!å!´!ˇˇˇˇ   Ç   ß          å!´!å!´!®    é!´!ú   é!´!©   é!´!™   é!´!ñ   öò;¯O                                    e   √   ‘∂  ñ;   ë   ‘∂  F      ñ"   ë   ‘∑   ÷F   Ÿ∂  F   o ë   úü00 `P: `Pß .ì P9 Q   5ûå!´!ç!´!    	 †    ∫  ?  °  ?  |             5ûå!´!ç!´!    	 † /   b  U  G  U  Ñ             5ûå!´!ç!´!     †     @  [  ,  [  •          ≥!´!å!´!ˇˇˇˇ   ¥   µ   ∂   ∑          é!´!∏   é!´!π   é!´!∫   é!´!ª   é!´!º   é!´!Ω   é!´!æ   é!´!ø   å!´!ç!´!    	  †¿   q  ƒ  h  ƒ  √   /          5ûé!´!v   é!´!¡   é!´!è   é!´!¬   öò;¯]  é                                 ∏   ï   ë    úë   µ   {   ∂  o √   ‘∑   F   √  ‘   ∑  î-   ë   ∏   î   ë   ∏    s  ‘ë   ìÏ   ë      ∑  îÿ   ë
+   ≤   µ   {   ∑   o ¿   ‘∏   ñ   ë   ‘∏ $   µ   o ë   î   ë    úë   µ   ƒ   ‘∏ 
+  î   ë   µ   {   ∏ 
+  s ‘ë   µ   {   f	   ∏   o ƒ   ‘∏   ÷F
+   Ÿ   ∏   ÷F   Ÿ   o    %s ‘ë   ü00 `P? `PA& F `P-P8 `PN	 `Pî00 `P? `Pô@0 `Pî00 `Pì P9 `Põ Pí0 `PA& F `PK `P?0 `P/PI `PO!E  PI# `P¢ (P)ˇˇˇ·PI& P   5ûå!´!ç!´!     † '   É  ”  c  ”  Õ   $        ≥!´!å!´!ˇˇˇˇ   √   ƒ          é!´!≈   é!´!∆   é!´!«   é!´!»   öò;¯Z   1                             
+    µ   ÷F   Ÿo  √   ‘∑   ÷F   Ÿo  î0   ë   ∑   F   î   ë   ∑   ÷F   Ÿ∂  o úë
+   úü@ `P,P8 `P+
+P= `Pì0 `P/PC	 F `P1 Q     5ûå!´!ç!´!    	 † "   ˚  {  €  {  ÿ   $          5ûå!´!ç!´!    	  †    ò  ñ  É  ñ  ﬁ          å!´!  †  G    G  Ì   %          5û 5ûå!´!ç!´!    	 †    ≥  "  û  "  ¸          å!´!  †¨   Í   £   Í     )          5û 5ûå!´!ç!´!    	  † (   2"  ˚"   "  ˚"              5ûå!´!ç!´!    	  †    Ç#  +  g#  +  &     @   å!´!  †q'  ´'  h'  ´'  >  +          5ûå!´!  †ò)  Ë*  è)  Ë*  Q  +          5ûä!´!ä!´!é!´!4   é!´!5    5ûå!´!ç!´!    	  † 
+   Ù+  ≠,  ⁄+  ≠,  j            5ûå!´!ç!´!    	 † $   œ,  ¿-  µ,  ¿-  s            5ûå!´!ç!´!    	  †    ù.  ™/  Ü.  ™/  Ö            5ûå!´!ç!´!    	  † !   "0  å1  
+0  å1  ë            5ûå!´!ç!´!    	  †    Ï1  ÷3  Ÿ1  ÷3  ¢            5ûå!´!ç!´!    	 †    Ú3  ƒ6  ﬁ3  ƒ6  ∏            5ûå!´!ç!´!    	  † 0   „6  ~7  Ã6  ~7  –            5ûå!´!ç!´!      † *   ì7  9  Ü7  9  ◊       
+   ≥!´!å!´!ˇˇˇˇ   ´   l            é!´!¨   é!´!≠   é!´!Æ   é!´!Ø   é!´!∞   é!´!±   é!´!B   é!´!≤   é!´!≥   öò;¯˙   Y                                  µ   F   ÷F   Ÿo  √   ‘∑   ÷F   Ÿ   o ˇî1   ë   µ   {   ∑   ÷F   Ÿ   o Go ì   ë   ë   √  ‘∑  î   ë   ∑  úë   ∑   ÷F   Ÿ   o ˇî1   ë   µ   {   ∑   ÷F   Ÿ	   o Go ì   ë   ë   √  ‘∑  î   ë   ∑  úë   úü0 `Pë P8 `Pê P™ (P%ˇˇˇÒPò0 `P> `PD	 F `Pê P™ *P%ˇˇˇÒPò0 `P> `PD	 F `P1 Q  5ûé!´!6   é!´!7   é!´!8   é!´!9   é!´!:   é!´!;   é!´!<   é!´!=   é!´!>   é!´!?   é!´!@   é!´!A   é!´!B   é!´!C   é!´!D   é!´!E   é!´!F   é!´!G   é!´!H   é!´!I   å!´!ç!´!    	  †J   {  $  r  $  ê   "          5ûé!´!K   å!´!ç!´!    	 †L   #  _#  #  _#  !            5ûé!´!M   å!´!ç!´!    	 †N   $+  k+  +  k+  `            5ûé!´!O   å!´!ç!´!    	 †P   ã+  “+  Ç+  “+  e            5ûé!´!Q   å!´!ç!´!    	 †R   ‡-  '.  ◊-  '.              5ûé!´!S   å!´!ç!´!      †T    89  @  /9  @  ‚         ≥!´!å!´!ˇˇˇˇ   i   j   k   l            é!´!m   é!´!n   é!´!o   é!´!p   é!´!q   é!´!>   å!´!ç!´!    	 †r   b;  û;  Z;  û;  Ù  $         5ûé!´!s   é!´!t   é!´!u   é!´!v   é!´!w   é!´!x   é!´!y   å!´!ç!´!    	 †z   >  +>  >  +>    J          5ûé!´!{   é!´!|   é!´!}   å!´!ç!´!    	 †z   …>  Â>  ¿>  Â>  	  J          5ûé!´!~   é!´!   é!´!Ä   é!´!Å   öò;¯}  ÷                             /     µ   ÷F   Ÿ∏   ∏ )  o √   ‘∑   î   ë   ƒ   ‘ë   ∑   î   ë   ∑      ƒ   ‘ìM   ë   µ   ÷F   Ÿ∏   ∏ )  ∏   î   ë
+      ì   ë
+      ë
+   s ‘ë   µ   {   ∏ "  o √  ‘∑  î   ë   ∑  f   H   ‘ë   ∏ .   ∏   s ‘µ   {   ∏ #  o ƒ &  ‘∏ &  ï”   ë   µ	   {	   
+   ∏ #  ∏   o ƒ &  ‘∏ &  ÷F   Ÿ      s ‘∏ &  ÷F   Ÿµ	   {	   
+   ∏    o s ‘µ	   {	   
+   ∏   o √  ‘∏ &  ÷F   Ÿ∑  s ‘∏ &  ∏ &  f   H   H   ‘µ   ÷F   Ÿ∏ &  s ‘ì$   ë$   ∏ &  ∏ &  f   H   H   ‘ë&   ∏ '   o  √  ‘∑  î   ë(   ƒ   ‘ë(   ∏   îD   ë)   µ   {   µ      ∏   s ‘µ   {   µ      ∏   s ‘ë/   ü0@ `Pñ P8 `Pê0 `P< `P>0 `Pö@0 `Pø PI `P/P8 `P>0 `Pî@ `P+PD `P/PI `P?@ `Pô P9 `Pñ P4 `P° P#ˇˇˇÙP4 `Pï P8 `Pê P4 `Pö0 `Pë PN&0 `Pü@* `P> `P> `PL/ `P? `Pô P4 `Pô PI3 P    5ûé!´!U   å!´!ç!´!    	 †V   +@  ÙE  "@  ÙE              5ûé!´!W   å!´!ç!´!    	 †X   F  eF  F  eF  >            5ûé!´!Y   å!´!ç!´!    	  †Z   ãF  ŒF  ÇF  ŒF  C  "          5ûé!´![   å!´!ç!´!    	  †\   ˜F  PG  ÓF  PG  H  %          5ûé!´!]   å!´!ç!´!    	  †^   yG  ºG  pG  ºG  N  %          5ûé!´!_   å!´!ç!´!    	  †`   ‹G  H  ”G  H  S            5ûé!´!a   å!´!ç!´!    	  †b   &H  PH  H  PH  X            5ûé!´!c   öò;¯à                                  ”√  ‘f   ƒ .  ‘f   ƒ   ‘f   ƒ   ‘f   ƒ +  ‘f   ƒ   ‘f   ƒ $  ‘f   ƒ   ‘f   ƒ   ‘f	   ƒ   ‘f
+   ƒ %  ‘f   ƒ   ‘f   ƒ 	  ‘f   ƒ !  ‘f   ƒ   ‘f   ƒ   ‘f   ƒ   ‘f   ƒ   ‘f   ƒ ,  ‘f   ƒ '  ‘dƒ   ‘Ùƒ   ‘Ëƒ   ‘   ƒ   ‘   ƒ #  ‘   ƒ    ‘   ƒ   ‘   ƒ -  ‘   √   ‘   √  ‘   ƒ   ‘ƒ	√  ‘µ   {      o ƒ   ‘ƒ &  ‘µ   ƒ (  ‘ƒ   ‘ƒ   ‘ƒ   ‘ƒ 
+  ‘ƒ *  ‘ƒ   ‘a    ƒ   ‘∏ (  ñ   ë   ‘∏ (  F   ë   î(   ë   ∏ (  F   ÷F    Ÿ!   o ì   ë
+   ë
+   ƒ   ‘"   ƒ "  ‘#   ƒ   ‘ƒ   ‘∏ (  ñ   ë   ‘∏ (  F$   ë   î   ë   ∏ (  F$   ì   ë   %   ë   ƒ   ‘∏ (  ñ   ë   ‘∏ (  F&   ë   î   ë   ∏ (  F&   ì   ë   '   ë   ƒ )  ‘ƒ   ‘∑  f(   H)   ‘∑  f*   H+   ‘∑  f,   H-   ‘∑  f.   H/   ‘∑  f0   H1   ‘∑  f2   H3   ‘∑  f4   H5   ‘∑  f6   H7   ‘∑  f8   H9   ‘∑  f:   H;   ‘∑  f<   H=   ‘∑  f>   H?   ‘∑  f@   HA   ‘üˇÿ@
+ `P8 `P9 `P9 `P; `P; `P; `P; `P; `P: `P: `P; `P8 `P/PI `P7 `P; `P7 `P7 `P7 `P7 `P7 `P7 `P; `Pø .Pô0 `P; `P; `P7 `PÕ0 `PÕ0 `PGÄ  è `POÄ   `POÄ _ `POÄ d `POÄ ~ `POÄ · `POÄ  `POÄ = `POÄ B `POÄ G `POÄ M `POÄ R `POÄ W `P?000P   5ûé!´!U   é!´!d   é!´!e   é!´!f   å!´!ç!´!      †‘H  ÎH  ÀH  ÎH  e            5ûé!´!g   å!´!ç!´!      †I  -I  
+I  -I  i  "          5ûé!´!h   å!´!ç!´!      †TI  mI  KI  mI  m  !          5ûöò;¯|   3                                  œ   ≤   f   }ÿ  ~  ¿   ‘µ   ÷F   Ÿs  ‘µ   ÷F   Ÿ   f   s ‘µ   ÷F   Ÿ	   f
+   s ‘µ   ÷F   Ÿ   f   s ‘üeP/PIÄ b`P,P40`Pñ P4000`Pñ P4000`Pñ P40 P   J˚4u≈8      `1R`1RBÆ‹|aCÛ   f    O^partitionKey=%28https%2Cbing.com%29,:https://cn.bing.com/s/as/18929812/MsnJVData/HoverTranslation.js strongly-framed 1 security-info FnhllAKWRHGAlo+ESXykKAAAAAAAAAAAwAAAAAAAAEaphjojH6pBabDSgSnsfLHeAAAAAgAAAAAAAAAAAAAAAAAAAAEANgFmCjImkVxP+7sgiYWmMt8FvcOXmlQiTNWFiWlrbpbqgwAAAAAAAAziMIIM3jCCCsagAwIBAgITfwAHP+m/X4JffLePJgAAAAc/6TANBgkqhkiG9w0BAQsFADBPMQswCQYDVQQGEwJVUzEeMBwGA1UEChMVTWljcm9zb2Z0IENvcnBvcmF0aW9uMSAwHgYDVQQDExdNaWNyb3NvZnQgUlNBIFRMUyBDQSAwMjAeFw0yMTAxMTkwMjEwMjBaFw0yMTA3MTkwMjEwMjBaMBcxFTATBgNVBAMTDHd3dy5iaW5nLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBALtyvjNIaDEpBgHoi3Hq9e62DuXeB6eVJ3pEGF9pPLH5JpSOt3u8Zfpshe0I8qBgWGI877K+iCwPG3tSst8NybLfeEik1Z1JxzPgph9xC3uPAJWNSXaG+ZChICUtIEFEfZ4dyoGpB8LGX82Cpdk6GCvq0WxTk6dhSgeF+MTmmvAvMS4Im8HEb0ruz8Z+Cx2GqY2gDIx0QACBEHQLSQmz2w4caQKvZtTCH4Y8gjiJvmwIBqPPmr2qSot5kRUZdFbwi0FlLUrmcYRE7Rrs3F0lVR9ceZ8LykoZ0p3JhSpAZ08q72eJM43NC9aYhydZgFDoIPNlbaGrmQjJTrKhh7emCu0CAwEAAaOCCOkwggjlMIIBBQYKKwYBBAHWeQIEAgSB9gSB8wDxAHYAfT7y+I//iFVoJMLAyp5SiXkrxQ54CX8uapdomX4i8NcAAAF3GHF4PQAABAMARzBFAiA/IV2Hn3TDzlg8r+Pw5lfcKvECYsC3Dm2o356gTi/AmQIhAPgBb5fydZBLH95SnqmyhHQgYQnMq/f37uUsdosP46frAHcA7sCV7o1yZA+S48O5G8cSo2lqCXtLahoUOOZHssvtxfkAAAF3GHF4NAAABAMASDBGAiEA5HA9s2/r8N+on58s5Gm0QEIX2pvliUObpOXJhJyk8fcCIQDO6gHTzvNoljkCdj6LjQS6JIYHJxS40vCNZ9dPOOhJ6TAnBgkrBgEEAYI3FQoEGjAYMAoGCCsGAQUFBwMBMAoGCCsGAQUFBwMCMD4GCSsGAQQBgjcVBwQxMC8GJysGAQQBgjcVCIfahnWD7tkBgsmFG4G1nmGF9OtggV2Fho5Bh8KYUAIBZAIBJTCBhwYIKwYBBQUHAQEEezB5MFMGCCsGAQUFBzAChkdodHRwOi8vd3d3Lm1pY3Jvc29mdC5jb20vcGtpL21zY29ycC9NaWNyb3NvZnQlMjBSU0ElMjBUTFMlMjBDQSUyMDAyLmNydDAiBggrBgEFBQcwAYYWaHR0cDovL29jc3AubXNvY3NwLmNvbTAdBgNVHQ4EFgQUfQyzsQomVt5vmIpIjxaFs+xTSD8wCwYDVR0PBAQDAgSwMIIFbQYDVR0RBIIFZDCCBWCCDHd3dy5iaW5nLmNvbYIQZGljdC5iaW5nLmNvbS5jboITKi5wbGF0Zm9ybS5iaW5nLmNvbYIKKi5iaW5nLmNvbYIIYmluZy5jb22CFmllb25saW5lLm1pY3Jvc29mdC5jb22CEyoud2luZG93c3NlYXJjaC5jb22CGWNuLmllb25saW5lLm1pY3Jvc29mdC5jb22CESoub3JpZ2luLmJpbmcuY29tgg0qLm1tLmJpbmcubmV0gg4qLmFwaS5iaW5nLmNvbYIYZWNuLmRldi52aXJ0dWFsZWFydGgubmV0gg0qLmNuLmJpbmcubmV0gg0qLmNuLmJpbmcuY29tghBzc2wtYXBpLmJpbmcuY29tghBzc2wtYXBpLmJpbmcubmV0gg4qLmFwaS5iaW5nLm5ldIIOKi5iaW5nYXBpcy5jb22CD2JpbmdzYW5kYm94LmNvbYIWZmVlZGJhY2subWljcm9zb2Z0LmNvbYIbaW5zZXJ0bWVkaWEuYmluZy5vZmZpY2UubmV0gg5yLmJhdC5iaW5nLmNvbYIQKi5yLmJhdC5iaW5nLmNvbYISKi5kaWN0LmJpbmcuY29tLmNugg8qLmRpY3QuYmluZy5jb22CDiouc3NsLmJpbmcuY29tghAqLmFwcGV4LmJpbmcuY29tghYqLnBsYXRmb3JtLmNuLmJpbmcuY29tgg13cC5tLmJpbmcuY29tggwqLm0uYmluZy5jb22CD2dsb2JhbC5iaW5nLmNvbYIRd2luZG93c3NlYXJjaC5jb22CDnNlYXJjaC5tc24uY29tghEqLmJpbmdzYW5kYm94LmNvbYIZKi5hcGkudGlsZXMuZGl0dS5saXZlLmNvbYIPKi5kaXR1LmxpdmUuY29tghgqLnQwLnRpbGVzLmRpdHUubGl2ZS5jb22CGCoudDEudGlsZXMuZGl0dS5saXZlLmNvbYIYKi50Mi50aWxlcy5kaXR1LmxpdmUuY29tghgqLnQzLnRpbGVzLmRpdHUubGl2ZS5jb22CFSoudGlsZXMuZGl0dS5saXZlLmNvbYILM2QubGl2ZS5jb22CE2FwaS5zZWFyY2gubGl2ZS5jb22CFGJldGEuc2VhcmNoLmxpdmUuY29tghVjbndlYi5zZWFyY2gubGl2ZS5jb22CDGRldi5saXZlLmNvbYINZGl0dS5saXZlLmNvbYIRZmFyZWNhc3QubGl2ZS5jb22CDmltYWdlLmxpdmUuY29tgg9pbWFnZXMubGl2ZS5jb22CEWxvY2FsLmxpdmUuY29tLmF1ghRsb2NhbHNlYXJjaC5saXZlLmNvbYIUbHM0ZC5zZWFyY2gubGl2ZS5jb22CDW1haWwubGl2ZS5jb22CEW1hcGluZGlhLmxpdmUuY29tgg5sb2NhbC5saXZlLmNvbYINbWFwcy5saXZlLmNvbYIQbWFwcy5saXZlLmNvbS5hdYIPbWluZGlhLmxpdmUuY29tgg1uZXdzLmxpdmUuY29tghxvcmlnaW4uY253ZWIuc2VhcmNoLmxpdmUuY29tghZwcmV2aWV3LmxvY2FsLmxpdmUuY29tgg9zZWFyY2gubGl2ZS5jb22CEnRlc3QubWFwcy5saXZlLmNvbYIOdmlkZW8ubGl2ZS5jb22CD3ZpZGVvcy5saXZlLmNvbYIVdmlydHVhbGVhcnRoLmxpdmUuY29tggx3YXAubGl2ZS5jb22CEndlYm1hc3Rlci5saXZlLmNvbYITd2VibWFzdGVycy5saXZlLmNvbYIVd3d3LmxvY2FsLmxpdmUuY29tLmF1ghR3d3cubWFwcy5saXZlLmNvbS5hdTCBsAYDVR0fBIGoMIGlMIGioIGfoIGchk1odHRwOi8vbXNjcmwubWljcm9zb2Z0LmNvbS9wa2kvbXNjb3JwL2NybC9NaWNyb3NvZnQlMjBSU0ElMjBUTFMlMjBDQSUyMDAyLmNybIZLaHR0cDovL2NybC5taWNyb3NvZnQuY29tL3BraS9tc2NvcnAvY3JsL01pY3Jvc29mdCUy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s7EKJlbeb5iKSI8WhbPsU0g/MAsGA1UdDwQEAwIEsDCCBW0GA1UdEQSCBWQwggVgggx3d3cuYmluZy5jb22CEGRpY3QuYmluZy5jb20uY26CEyoucGxhdGZvcm0uYmluZy5jb22CCiouYmluZy5jb22CCGJpbmcuY29tghZpZW9ubGluZS5taWNyb3NvZnQuY29tghMqLndpbmRvd3NzZWFyY2guY29tghljbi5pZW9ubGluZS5taWNyb3NvZnQuY29tghEqLm9yaWdpbi5iaW5nLmNvbYINKi5tbS5iaW5nLm5ldIIOKi5hcGkuYmluZy5jb22CGGVjbi5kZXYudmlydHVhbGVhcnRoLm5ldIINKi5jbi5iaW5nLm5ldIINKi5jbi5iaW5nLmNvbYIQc3NsLWFwaS5iaW5nLmNvbYIQc3NsLWFwaS5iaW5nLm5ldIIOKi5hcGkuYmluZy5uZXSCDiouYmluZ2FwaXMuY29tgg9iaW5nc2FuZGJveC5jb22CFmZlZWRiYWNrLm1pY3Jvc29mdC5jb22CG2luc2VydG1lZGlhLmJpbmcub2ZmaWNlLm5ldIIOci5iYXQuYmluZy5jb22CECouci5iYXQuYmluZy5jb22CEiouZGljdC5iaW5nLmNvbS5jboIPKi5kaWN0LmJpbmcuY29tgg4qLnNzbC5iaW5nLmNvbYIQKi5hcHBleC5iaW5nLmNvbYIWKi5wbGF0Zm9ybS5jbi5iaW5nLmNvbYINd3AubS5iaW5nLmNvbYIMKi5tLmJpbmcuY29tgg9nbG9iYWwuYmluZy5jb22CEXdpbmRvd3NzZWFyY2guY29tgg5zZWFyY2gubXNuLmNvbYIRKi5iaW5nc2FuZGJveC5jb22CGSouYXBpLnRpbGVzLmRpdHUubGl2ZS5jb22CDyouZGl0dS5saXZlLmNvbYIYKi50MC50aWxlcy5kaXR1LmxpdmUuY29tghgqLnQxLnRpbGVzLmRpdHUubGl2ZS5jb22CGCoudDIudGlsZXMuZGl0dS5saXZlLmNvbYIYKi50My50aWxlcy5kaXR1LmxpdmUuY29tghUqLnRpbGVzLmRpdHUubGl2ZS5jb22CCzNkLmxpdmUuY29tghNhcGkuc2VhcmNoLmxpdmUuY29tghRiZXRhLnNlYXJjaC5saXZlLmNvbYIVY253ZWIuc2VhcmNoLmxpdmUuY29tggxkZXYubGl2ZS5jb22CDWRpdHUubGl2ZS5jb22CEWZhcmVjYXN0LmxpdmUuY29tgg5pbWFnZS5saXZlLmNvbYIPaW1hZ2VzLmxpdmUuY29tghFsb2NhbC5saXZlLmNvbS5hdYIUbG9jYWxzZWFyY2gubGl2ZS5jb22CFGxzNGQuc2VhcmNoLmxpdmUuY29tgg1tYWlsLmxpdmUuY29tghFtYXBpbmRpYS5saXZlLmNvbYIObG9jYWwubGl2ZS5jb22CDW1hcHMubGl2ZS5jb22CEG1hcHMubGl2ZS5jb20uYXWCD21pbmRpYS5saXZlLmNvbYINbmV3cy5saXZlLmNvbYIcb3JpZ2luLmNud2ViLnNlYXJjaC5saXZlLmNvbYIWcHJldmlldy5sb2NhbC5saXZlLmNvbYIPc2VhcmNoLmxpdmUuY29tghJ0ZXN0Lm1hcHMubGl2ZS5jb22CDnZpZGVvLmxpdmUuY29tgg92aWRlb3MubGl2ZS5jb22CFXZpcnR1YWxlYXJ0aC5saXZlLmNvbYIMd2FwLmxpdmUuY29tghJ3ZWJtYXN0ZXIubGl2ZS5jb22CE3dlYm1hc3RlcnMubGl2ZS5jb22CFXd3dy5sb2NhbC5saXZlLmNvbS5hdYIUd3d3Lm1hcHMubGl2ZS5jb20uYXUwgbAGA1UdHwSBqDCBpTCBoqCBn6CBnIZNaHR0cDovL21zY3JsLm1pY3Jvc29mdC5jb20vcGtpL21zY29ycC9jcmwvTWljcm9zb2Z0JTIwUlNBJTIwVExTJTIwQ0ElMjAwMi5jcmyGS2h0dHA6Ly9jcmwubWljcm9zb2Z0LmNvbS9wa2kvbXNjb3JwL2NybC9NaWNyb3NvZnQlMjBSU0ElMjBUTFMlMjBDQSUyMDAyLmNybDBXBgNVHSAEUDBOMEIGCSsGAQQBgjcqATA1MDMGCCsGAQUFBwIBFidodHRwOi8vd3d3Lm1pY3Jvc29mdC5jb20vcGtpL21zY29ycC9jcHMwCAYGZ4EMAQIBMB8GA1UdIwQYMBaAFP8vf+EG9DjzLe0ljZjC/g72bPz6MB0GA1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjANBgkqhkiG9w0BAQsFAAOCAgEAb/jAXfiQkFNCQu88u4sFd1wIlq+9huXHe4PKjuHsIyTMnaE6BfBOgZ3SAZWj4h3EZWNP1GWCBqVPU+8QdMYF2M6NRPWuc51CBpn0jX2pX2QJJzEuVSHRpFsKgWL5+wIm6ho4h+dtQo3cXnVsvzY0JbJjMcy4f5F5KlqJ4TI7hctbvYWW1gwR1OisIx3InIpIFkffqYGXaWm9cWfq8Pbm2AC4y5fB+0ZzhUlcIimWkembhzTfuyYsuUrK3widCYd5Kmgy9+TzHVtkpVfJ3h9q99cH+m9xFRwZXSLr4mNOWnUecMuqHWM644HI/UHZU26Wo0YE8M7jnlizj+fdhgHKSOYontraEX7j7ZglLW4Aef0np3ldfmKr/RJ2MaFIitEPI328qEwGf7rkFJK82ppWZBMOteZDjR+PQERGIrrshQMoL2ddX+FehoEvv2Nyuef5l+Z4inGkLFr6pX7LwSQuN5Q0DQI7+37zxsQThBfJrLquOPxuG1Oajbob1WFev0z60VgBkqJitjjzvkolYpvx5zz+1PiqM+YEw9MKw6535I9irkvF+wFRsk6tIYUopaxOnlXPUJd9d+UJIWBG/twNCZUqVuZHxPGKGCraMNgk5RrBOlOpvlegBS25HNPKwusNpyAXyxeNZVOfAoMlBsjwbAd4MsPACrdoGDioYOGUKetmCjImkVxP+7sgiYWmMt8FvcOXmlQiTNWFiWlrbpbqgwAAAAAAAAVeMIIFWjCCBEKgAwIBAgIQD6dHIsU9iMgPWJ77H51KOjANBgkqhkiG9w0BAQsFADBaMQswCQYDVQQGEwJJRTESMBAGA1UEChMJQmFsdGltb3JlMRMwEQYDVQQLEwpDeWJlclRydXN0MSIwIAYDVQQDExlCYWx0aW1vcmUgQ3liZXJUcnVzdCBSb290MB4XDTIwMDcyMTIzMDAwMFoXDTI0MTAwODA3MDAwMFowTzELMAkGA1UEBhMCVVMxHjAcBgNVBAoTFU1pY3Jvc29mdCBDb3Jwb3JhdGlvbjEgMB4GA1UEAxMXTWljcm9zb2Z0IFJTQSBUTFMgQ0EgMDIwggIiMA0GCSqGSIb3DQEBAQUAA4ICDwAwggIKAoICAQD0wBlZqiokfAYhMdHuEvWBapTj9tFKL+NdsS4pFDi8zJVdKQfR+F039CDXtD9YOnqS7o88+isKcgOeQNTri472mPnn8N3vPCX0bDOEVk+nkZNIBA3zApvGGg/40Thv78kAlxibMipsKahdbuoHByOB4ZlYotcBhf/ObUf65kCRfXMRQqOKWkZLkilPPn3zkYM5GHxeI4MNZ1SoKBEoHa2E/uDwBQVxadY4SRZWFxMd7ARyI4Cz1ik4N2Z6ALD3MfjAgEEDwoknyw9TGvr4PubAZdqU511zNLBoavar2OAVTl0Tddj+RAhbnX1/zypqk+ifv+d3CgiDa8Mbvo1u2Q8nuUBrKVUmR6EjkV/dDrIsUaU643v/Wp/uE7xLDdhC5rplK9siNlYohMTMKLAkjxVeWBWbQj7REickISpc+yowi3yUrO5lCgNAKrCNYw+wAfAvhFkOeqPm6kP41IHVXVtGNC/UogcdiKUiR/N59IfYB+o2v54GMW+ubSC3BohLFbho/oZZ5XyulIZK75pwTHmauCIeE5clU9ivpLwPTx9b0Vno9+ApElrFgdY0/YKZ46GfjOC9ta4G25VJ1WKsMmWLtzyrfgwbYopquZd724fFdpvsxfIvMG5m3VFkThOqzsOttDcUfyMTqM2pan4txG58uxNJ0MjR03UCEULRU+qMnwIDAQABo4IBJTCCASEwHQYDVR0OBBYEFP8vf+EG9DjzLe0ljZjC/g72bPz6MB8GA1UdIwQYMBaAFOWdWTCCR1jMrPoIVDaGezq1BE3wMA4GA1UdDwEB/wQEAwIBhjAdBgNVHSUEFjAUBggrBgEFBQcDAQYIKwYBBQUHAwIwEgYDVR0TAQH/BAgwBgEB/wIBADA0BggrBgEFBQcBAQQoMCYwJAYIKwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmRpZ2ljZXJ0LmNvbTA6BgNVHR8EMzAxMC+gLaArhilodHRwOi8vY3JsMy5kaWdpY2VydC5jb20vT21uaXJvb3QyMDI1LmNybDAqBgNVHSAEIzAhMAgGBmeBDAECATAIBgZngQwBAgIwCwYJKwYBBAGCNyoBMA0GCSqGSIb3DQEBCwUAA4IBAQCg2d165dQ1tHS0IN83uOi4S5heLhsx+zXIOwtxnvwCWdOJ3wFLQaFDcgaMtN79UjMIFVIUedDZBsvalKnx+6l2tM/VH4YAyNPx+u1LFR0joPYpQYLbNYkedkNuhRmEBesPqj4aDz68ZDI6fJ92sj2q18QvJUJ5Qz728AvtFOat+AjgK0PFqPYEAviUKr162NB1XZJxf6uyIjUlnG4UEdHfUqdhl0R84mMtrYINksTzQ2sHYM8fEhqICtTlcRLr/FErUaPUe9648nziSnA0qKH7rUZqP/Ifmbo+WNZSZG1BbgOhlk+521W+Ncih3HRbvRBE0LWYT8vWKnfjgZKxwHwJZgoyJpFcT/u7IImFpjLfBb3Dl5pUIkzVhYlpa26W6oMAAAAAAAADezCCA3cwggJfoAMCAQICBAIAALkwDQYJKoZIhvcNAQEFBQAwWjELMAkGA1UEBhMCSUUxEjAQBgNVBAoTCUJhbHRpbW9yZTETMBEGA1UECxMKQ3liZXJUcnVzdDEiMCAGA1UEAxMZQmFsdGltb3JlIEN5YmVyVHJ1c3QgUm9vdDAeFw0wMDA1MTIxODQ2MDBaFw0yNTA1MTIyMzU5MDBaMFoxCzAJBgNVBAYTAklFMRIwEAYDVQQKEwlCYWx0aW1vcmUxEzARBgNVBAsTCkN5YmVyVHJ1c3QxIjAgBgNVBAMTGUJhbHRpbW9yZSBDeWJlclRydXN0IFJvb3QwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCjBLsiq5g9V+gmcpq1edQp4uHolYCxsONbjispmmTfoV3tsAkFbdsoLs5iomL+tIjaEus46yGdwEErAVJ7iHfTHI/HurmItWoJ53PoEUCn0czKYo0t5Y8LplDSqFDDKOr1qyWHipqWHKlnuD8M1ff5UhMvwhvVcHDwj8ASygbLmuHZyjN6d9b47LnxaERCSBPSwMKkrl5g/ramBfy03QdZAtRZGJhj9aVj4JAMfV2yBnrzherr1AOuXoQ+X/8V7Wm8+Tk2cnXPd1JN88mQLLk95ckjUz8fJJghXAeZKb3GOuznboY6a5d0YzO9aBgx8HiNdr/8no5dKoanTZDcJxo5AgMBAAGjRTBDMB0GA1UdDgQWBBTlnVkwgkdYzKz6CFQ2hns6tQRN8DASBgNVHRMBAf8ECDAGAQH/AgEDMA4GA1UdDwEB/wQEAwIBBjANBgkqhkiG9w0BAQUFAAOCAQEAhQxdjuRvUWhCBaDdu08nJYQDvfdk/S3XMOOkEBfr2ikptnk/dvYZEyO4EAr5WKTUYXC9BGFqEooX1Qq9xbwwfNbpDCWNhkBP7MyjfjjGNxFP7d1oMY5M0rMBdO6+dV4HSBp/cP8WXITAeYW4Bf1/vmURow/AArT4Ujc5BNWpMXoYv6Aq9BKZ96NFguM8XvWdnrXInnwuyKSeTggUS239cG1rGmO9ZOYft87w8p8uuxu38lCIc5LC4uMWjZoyAquOGN3pEBHufjWrkK8+MJR60DM9p2UP9fyOnmLPR0QsAV27HbUy0kfSOC7Q/oHcMmoete481fzngR0ZwyRC6mM5qQAAAAEAAAACaDIAAQA= request-method GET response-head HTTP/2 200 OK
+cache-control: public, max-age=15552000
+content-length: 18799
+content-type: application/x-javascript
+last-modified: Fri, 19 Feb 2021 21:51:21 GMT
+x-cache: TCP_HIT
+server: Kestrel
+x-msedge-ref: Ref A: 44D98174F9E24171B2BB4AE314CBACEB Ref B: BJ1EDGE0707 Ref C: 2021-02-20T11:43:48Z
+date: Sat, 20 Feb 2021 11:43:47 GMT
+X-Firefox-Spdy: h2
+ original-response-headers cache-control: public, max-age=15552000
+content-length: 18799
+content-type: application/x-javascript
+last-modified: Fri, 19 Feb 2021 21:51:21 GMT
+x-cache: TCP_HIT
+server: Kestrel
+x-msedge-ref: Ref A: 44D98174F9E24171B2BB4AE314CBACEB Ref B: BJ1EDGE0707 Ref C: 2021-02-20T11:43:48Z
+date: Sat, 20 Feb 2021 11:43:47 GMT
+X-Firefox-Spdy: h2
+ ctid 2 uncompressed-len 0 net-response-time-onstart 68 net-response-time-onstop 97 alt-data 1;18799,javascript/moz-bytecode-20210204182252-8l1 alt-data-from-child 1   √X

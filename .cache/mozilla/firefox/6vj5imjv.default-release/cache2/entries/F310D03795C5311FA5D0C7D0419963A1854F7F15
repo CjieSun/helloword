@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>AndroidXRef</title>
+        <link rel="stylesheet" type="text/css" href="style.css" media="screen">
+
+        <!-- you don't need to keep this, but it's cool for stats! -->
+        <meta name="generator" content="nanoc 3.4.0">
+
+
+	<!-- Global site tag (gtag.js) - Google Analytics -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=UA-37941318-1"></script>
+	<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-37941318-1');
+	</script>
+
+    </head>
+    <body>
+    <div id="web_body">
+        <div id="header">
+            <a href="/"><img src="images/title.png"/></a>
+        </div>
+        <div id="split"></div>
+        <div id="split_bottom"></div>
+        <div id="index_box"></div>
+        <div id="kernel_box"></div>
+        <div id="donate_box"></div>
+        <div id="main">
+            <h2 id="news">News</h2>
+            <hr />
+            <ul>
+                <li><b>2018-08-11</b> - New Index: <a href="http://androidxref.com/9.0.0_r3/">Pie - 9.0.0_r3</a></li>
+                <li><b>2018-06-19</b> - New Index: <a href="http://androidxref.com/8.1.0_r33/">Oreo - 8.1.0_r33</a></li>
+                <li><b>2017-12-22</b> - New Index: <a href="http://androidxref.com/7.1.2_r36/">Nougat - 7.1.2_r36</a></li>
+                <li><b>2017-09-19</b> - New Index: <a href="http://androidxref.com/8.0.0_r4/">Oreo - 8.0.0_r4</a></li>
+                <li><b>2016-12-22</b> - New Index: <a href="http://androidxref.com/7.1.1_r6/">Nougat - 7.1.1_r6</a></li>
+                <li><b>2016-08-24</b> - New Index: <a href="http://androidxref.com/7.0.0_r1/">Nougat - 7.0.0_r1</a></li>
+                <li><b>2016-01-08</b> - New Index: <a href="http://androidxref.com/6.0.1_r10/">Marshmallow - 6.0.1_r10</a></li>
+                <li><b>2016-01-07</b> - New Index: <a href="http://androidxref.com/6.0.0_r5/">Marshmallow - 6.0.0_r5</a></li>
+                <li><b>2015-10-07</b> - New Index: <a href="http://androidxref.com/6.0.0_r1/">Marshmallow - 6.0.0_r1</a></li>
+                <li><b>2015-07-03</b> - New Index: <a href="http://androidxref.com/5.1.1_r6/">Lollipop - 5.1.1_r6</a></li>
+                <li><b>2015-03-13</b> - New Index: <a href="http://androidxref.com/5.1.0_r1/">Lollipop - 5.1.0_r1</a></li>
+                <li><b>2014-09-06</b> - New Index: <a href="http://androidxref.com/5.0.0_r2/">Lollipop - 5.0.0_r2</a></li>
+                <li><b>2014-07-14</b> - New Index: <a href="http://androidxref.com/4.4.4_r1/">KitKat - 4.4.4_r1</a></li>
+                <li><b>2014-06-06</b> - New Index: <a href="http://androidxref.com/4.4.3_r1.1/">KitKat - 4.4.3_r1.1</a></li>
+                <li><b>2014-03-25</b> - New Index: <a href="http://androidxref.com/4.4.2_r2/">KitKat - 4.4.2_r2</a></li>
+                <li><b>2014-01-08</b> - New Index: <a href="http://androidxref.com/4.4.2_r1/">KitKat - 4.4.2_r1</a></li>
+                <li><b>2013-11-01</b> - New Index: <a href="http://androidxref.com/4.4_r1/">KitKat - 4.4  </a></li>
+                <li><b>2013-10-31</b> - New Index: <a href="http://androidxref.com/2.3.7/">Gingerbread - 2.3.7</a></li>
+                <li><b>2013-09-30</b> - New Index: <a href="http://androidxref.com/4.0.3_r1/">ICS - 4.0.3</a></li>
+                <li><b>2013-07-25</b> - New Index: <a href="http://androidxref.com/4.3_r2.1/">JellyBean - 4.3</a></li>
+                <li><b>2013-04-22</b> - New Index: <a href="http://androidxref.com/4.1.2/">JellyBean - 4.1.2</a></li>
+                <li><b>2013-02-25</b> - New Index: <a href="http://androidxref.com/4.2.2_r1/">JellyBean - 4.2.2</a></li>
+                <li><b>2012-11-21</b> - New Index: <a href="http://androidxref.com/4.2_r1/">JellyBean - 4.2</a></li>
+                <li><b>2012-08-22</b> - New Index: <a href="http://androidxref.com/2.2.3/">Froyo - 2.2.3</a></li>
+                <li><b>2012-08-22</b> - New Index: <a href="http://androidxref.com/2.1/">Eclair - 2.1</a></li>
+                <li><b>2012-08-22</b> - New Index: <a href="http://androidxref.com/1.6/">Donut - 1.6</a></li>
+                <li><b>2012-07-18</b> - New Index: <a href="http://androidxref.com/4.1.1/">JellyBean - 4.1.1</a></li>
+                <li><b>2012-06-13</b> - New Index: <a href="http://androidxref.com/4.0.4/">ICS - 4.0.4</a></li>
+                <li><b>2011-09-02</b> - New Index: <a href="http://androidxref.com/2.3.6/">Gingerbread - 2.3.6</a></li>
+            </ul>
+
+        </div>
+        <div id="sidebar_left">
+            <h2>Android Source</h2>
+            <ul>
+                <li><a href="http://androidxref.com/9.0.0_r3/">Pie - 9.0.0_r3</a></li>
+                <li><a href="http://androidxref.com/8.1.0_r33/">Oreo - 8.1.0_r33</a></li>
+                <li><a href="http://androidxref.com/8.0.0_r4/">Oreo - 8.0.0_r4</a></li>
+                <li><a href="http://androidxref.com/7.1.2_r36/">Nougat - 7.1.2_r36</a></li>
+                <li><a href="http://androidxref.com/7.1.1_r6/">Nougat - 7.1.1_r6</a></li>
+                <li><a href="http://androidxref.com/7.0.0_r1/">Nougat - 7.0.0_r1</a></li>
+                <li><a href="http://androidxref.com/6.0.1_r10/">Marshmallow - 6.0.1_r10</a></li>
+                <li><a href="http://androidxref.com/6.0.0_r5/">Marshmallow - 6.0.0_r5</a></li>
+                <li><a href="http://androidxref.com/6.0.0_r1/">Marshmallow - 6.0.0_r1</a></li>
+                <li><a href="http://androidxref.com/5.1.1_r6/">Lollipop - 5.1.1_r6</a></li>
+                <li><a href="http://androidxref.com/5.1.0_r1/">Lollipop - 5.1.0_r1</a></li>
+                <li><a href="http://androidxref.com/5.0.0_r2/">Lollipop - 5.0.0_r2</a></li>
+                <li><a href="http://androidxref.com/4.4.4_r1/">KitKat - 4.4.4_r1</a></li>
+                <li><a href="http://androidxref.com/4.4.3_r1.1/">KitKat - 4.4.3_r1.1</a></li>
+                <li><a href="http://androidxref.com/4.4.2_r2/">KitKat - 4.4.2_r2</a></li>
+                <li><a href="http://androidxref.com/4.4.2_r1/">KitKat - 4.4.2_r1</a></li>
+                <li><a href="http://androidxref.com/4.4_r1/">KitKat - 4.4  </a></li>
+                <li><a href="http://androidxref.com/4.3_r2.1/">JellyBean - 4.3</a></li>
+                <li><a href="http://androidxref.com/4.2.2_r1/">JellyBean - 4.2.2</a></li>
+                <li><a href="http://androidxref.com/4.2_r1/">JellyBean - 4.2</a></li>
+                <li><a href="http://androidxref.com/4.1.2/">JellyBean - 4.1.2</a></li>
+                <li><a href="http://androidxref.com/4.1.1/">JellyBean - 4.1.1</a></li>
+                <li><a href="http://androidxref.com/4.0.4/">ICS - 4.0.4</a></li>
+                <li><a href="http://androidxref.com/4.0.3_r1/">ICS - 4.0.3</a></li>
+                <li><a href="http://androidxref.com/2.3.7/">Gingerbread - 2.3.7</a></li>
+                <li><a href="http://androidxref.com/2.3.6/">Gingerbread - 2.3.6</a></li>
+                <li><a href="http://androidxref.com/2.2.3/">Froyo - 2.2.3</a></li>
+                <li><a href="http://androidxref.com/2.1/">Eclair - 2.1</a></li>
+                <li><a href="http://androidxref.com/1.6/">Donut - 1.6</a></li>
+            </ul>
+        </div>
+
+
+        <div id="sidebar_right">
+            <h2>Kernel Source</h2>
+            <ul>
+                <li><a href="http://androidxref.com/kernel_3.18/">Kernel - 3.18</a></li>
+                <li><a href="http://androidxref.com/kernel_3.14/">Kernel - 3.14</a></li>
+                <li><a href="http://androidxref.com/kernel_3.10/">Kernel - 3.10</a></li>
+                <li><a href="http://androidxref.com/kernel_3.4/">Kernel - 3.4</a></li>
+                <li><a href="http://androidxref.com/kernel_3.3/">Kernel - 3.3</a></li>
+                <li><a href="http://androidxref.com/kernel_3.0/">Kernel - 3.0</a></li>
+                <li><a href="http://androidxref.com/kernel_2.6.39/">Kernel - 2.6.39</a></li>
+            </ul>
+            <ul>
+                <img src="images/logo.png"/>
+            </ul>
+            <h2>Contact</h2>
+            <ul><li>
+                <p>Rodrigo Chiossi
+                <b> contact(at)androidxref.com </b></p>
+            </li></ul>
+        </div>
+	<img id="ethereum_logo" src="images/ethereum.png"/>
+	<div id="bottom_bar">
+		<b id="ethereum_addr"> 0xFCfa5A73675627B3ea7F396bC06346392d20813d </b>
+	</div>
+	<div id="donate">
+	    <ul>
+	    <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+	    <input type="hidden" name="cmd" value="_s-xclick">
+	    <input type="hidden" name="hosted_button_id" value="T4VA8Y62WGWVY">
+	    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+	    <img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+            </ul>
+	</form>
+	</div>
+    </div>
+    </body>
+</html>
+"NÝXy<      `0ûj`0ûB¬¼¦`:5ê   D    O^partitionKey=%28http%2Candroidxref.com%29,:http://androidxref.com/ necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Accept-Ranges: bytes
+ETag: W/"8984-1569253487000"
+Last-Modified: Mon, 23 Sep 2019 15:44:47 GMT
+Content-Type: text/html
+Content-Length: 8984
+Date: Sat, 20 Feb 2021 12:07:16 GMT
+ original-response-headers Server: Apache-Coyote/1.1
+Accept-Ranges: bytes
+ETag: W/"8984-1569253487000"
+Last-Modified: Mon, 23 Sep 2019 15:44:47 GMT
+Content-Type: text/html
+Content-Length: 8984
+Date: Sat, 20 Feb 2021 12:07:16 GMT
+ ctid 1 uncompressed-len 0 net-response-time-onstart 10311 net-response-time-onstop 10332   #

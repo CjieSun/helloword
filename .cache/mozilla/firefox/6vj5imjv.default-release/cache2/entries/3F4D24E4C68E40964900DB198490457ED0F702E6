@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta name="robots" content="noindex,nofollow" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="0.11.1 (2b48ae40ea1b)" />
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+<link rel="icon" href="/9.0.0_r3/default/img/icon.png" type="image/png" />
+<link rel="stylesheet" type="text/css" media="all"
+    title="Default" href="/9.0.0_r3/default/style.css" />
+<link rel="alternate stylesheet" type="text/css" media="all"
+    title="Paper White" href="/9.0.0_r3/default/print.css" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="/9.0.0_r3/default/jquery.tooltip.css" />
+
+<link rel="search" href="/9.0.0_r3/opensearch"
+    type="application/opensearchdescription+xml"
+    title="OpenGrok Search for current project(s)" />
+<script type="text/javascript" src="/9.0.0_r3/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="/9.0.0_r3/jquery.tooltip-1.3.pack.js"></script>
+
+<script type="text/javascript" src="/9.0.0_r3/utils.js"></script>
+<title>Cross Reference: /toolchain/benchmark/</title>
+    <script type="text/javascript">
+      var _gaq = _gaq || [];
+      var pluginUrl = 
+      '//www.google-analytics.com/plugins/ga/inpage_linkid.js';
+      _gaq.push(['_require', 'inpage_linkid', pluginUrl]);
+      _gaq.push(['_setAccount', 'UA-37941318-1']);
+      _gaq.push(['_setDomainName', 'androidxref.com']);
+      _gaq.push(['_trackPageview']);
+      
+      (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();      
+    </script>
+</head><body>
+<script type="text/javascript">/* <![CDATA[ */
+    document.hash = 'null';document.rev = '';document.link = '/9.0.0_r3/xref/toolchain/benchmark/';document.annotate = false;
+    document.domReady.push(function() {domReadyMast();});
+    document.pageReady.push(function() { pageReadyMast();});
+/* ]]> */</script>
+<div id="page">
+    <div id="whole_header">
+        <form action="/9.0.0_r3/search">
+<div id="header">
+<a href="/9.0.0_r3/"><span id="MastheadLogo"></span></a>
+
+
+
+    <div id="pagetitle"><span id="filename"
+                    >Cross Reference: benchmark</span></div>
+</div>
+<div id="Masthead">
+    <tt><a href="/9.0.0_r3/xref/">xref</a>: /<a href="/9.0.0_r3/xref/toolchain/">toolchain</a>/<a href="/9.0.0_r3/xref/toolchain/benchmark/">benchmark</a>/</tt>
+</div>
+<div id="bar">
+    <ul>
+        <li><a href="/9.0.0_r3/"><span id="home"></span>Home</a></li><li><a href="/9.0.0_r3/history/toolchain/benchmark/"><span id="history"></span>History</a></li><li><span class="c"><span class="annotate"></span>Annotate</span></li><li><input type="text" id="search" name="q" class="q" />
+            <input type="submit" value="Search" class="submit" /></li><li><input type="checkbox" name="path" value="/toolchain/benchmark/" /> only in <b>/toolchain/benchmark/</b></li>
+        
+    </ul>
+    <input type="hidden" name="project" value="toolchain" />
+</div>
+        </form>
+    </div>
+<div id="content">
+<script type="text/javascript">/* <![CDATA[ */
+document.pageReady.push(function() { pageReadyList();});
+/* ]]> */</script>
+<table id="dirlist">
+<thead>
+<tr><th/><th>Name</th><th>Date</th><th>Size</th></tr>
+</thead>
+<tbody>
+<tr><td><p class="'r'"/></td><td><b><a href="..">..</a></b></td><td>10-Aug-2018</td><td>4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href=".gitignore">.gitignore</a></td><td>10-Aug-2018</td><td>12 </td></tr>
+<tr><td><p class="p"/></td><td><a href="apply_patches.py">apply_patches.py</a></td><td>10-Aug-2018</td><td>3.4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="autotest.diff">autotest.diff</a></td><td>10-Aug-2018</td><td>44 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="Binder_flags_aosp.diff">Binder_flags_aosp.diff</a></td><td>10-Aug-2018</td><td>420 </td></tr>
+<tr><td><p class="p"/></td><td><a href="Binder_flags_internal.diff">Binder_flags_internal.diff</a></td><td>10-Aug-2018</td><td>420 </td></tr>
+<tr><td><p class="p"/></td><td><a href="build_bench.py">build_bench.py</a></td><td>10-Aug-2018</td><td>7.4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="collect_profile.py">collect_profile.py</a></td><td>10-Aug-2018</td><td>4.6 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="config.py">config.py</a></td><td>10-Aug-2018</td><td>2.9 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="Dex2oat_flags_aosp.diff">Dex2oat_flags_aosp.diff</a></td><td>10-Aug-2018</td><td>322 </td></tr>
+<tr><td><p class="p"/></td><td><a href="Dex2oat_flags_internal.diff">Dex2oat_flags_internal.diff</a></td><td>10-Aug-2018</td><td>322 </td></tr>
+<tr><td><p class="r"/></td><td><a href="dex2oat_input/"><b>dex2oat_input</b></a>/</td><td>10-Aug-2018</td><td>4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="discard_patches.py">discard_patches.py</a></td><td>10-Aug-2018</td><td>1.7 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="env_setting">env_setting</a></td><td>10-Aug-2018</td><td>1 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="fix_json.py">fix_json.py</a></td><td>10-Aug-2018</td><td>1.9 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="fix_skia_results.py">fix_skia_results.py</a></td><td>10-Aug-2018</td><td>4.9 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="gen_json.py">gen_json.py</a></td><td>10-Aug-2018</td><td>2.8 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="Hwui_flags_aosp.diff">Hwui_flags_aosp.diff</a></td><td>10-Aug-2018</td><td>519 </td></tr>
+<tr><td><p class="p"/></td><td><a href="Hwui_flags_internal.diff">Hwui_flags_internal.diff</a></td><td>10-Aug-2018</td><td>519 </td></tr>
+<tr><td><p class="p"/></td><td><a href="OWNERS">OWNERS</a></td><td>10-Aug-2018</td><td>218 </td></tr>
+<tr><td><p class="p"/></td><td><a href="panorama.diff">panorama.diff</a></td><td>10-Aug-2018</td><td>916.5 KiB</td></tr>
+<tr><td><p class="r"/></td><td><a href="panorama_input/"><b>panorama_input</b></a>/</td><td>10-Aug-2018</td><td>4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="parse_result.py">parse_result.py</a></td><td>10-Aug-2018</td><td>3.7 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="README.txt">README.txt</a></td><td>10-Aug-2018</td><td>1.4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="run.py">run.py</a></td><td>10-Aug-2018</td><td>16.8 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="set_flags.py">set_flags.py</a></td><td>10-Aug-2018</td><td>4 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="Skia_flags_aosp.diff">Skia_flags_aosp.diff</a></td><td>10-Aug-2018</td><td>912 </td></tr>
+<tr><td><p class="p"/></td><td><a href="Skia_flags_internal.diff">Skia_flags_internal.diff</a></td><td>10-Aug-2018</td><td>1.3 KiB</td></tr>
+<tr><td><p class="p"/></td><td><a href="synthmark.diff">synthmark.diff</a></td><td>10-Aug-2018</td><td>767 </td></tr>
+<tr><td><p class="p"/></td><td><a href="test_config">test_config</a></td><td>10-Aug-2018</td><td>775 </td></tr>
+</tbody>
+</table><h3>README.txt</h3>
+<div id="src">
+    <pre><a class="l" name="1" href="#1">1</a>This is a Android Toolchain benchmark suite.
+<a class="l" name="2" href="#2">2</a>===========================================
+<a class="l" name="3" href="#3">3</a>Where to find this suite:
+<a class="l" name="4" href="#4">4</a>	This suite locates at <a href="/9.0.0_r3/s?path=toolchain/benchmark&amp;project=toolchain">toolchain/benchmark</a> under Android repository tree.
+<a class="l" name="5" href="#5">5</a>
+<a class="l" name="6" href="#6">6</a>To use this suite:
+<a class="l" name="7" href="#7">7</a>	1. Configure the basic envrionment in env_setting file.
+<a class="l" name="8" href="#8">8</a>
+<a class="l" name="9" href="#9">9</a>	2. Run ./<a href="/9.0.0_r3/s?path=apply_patches.py&amp;project=toolchain">apply_patches.py</a>, which will:
+<a class="hl" name="10" href="#10">10</a>		1) Create non-existing benchmarks in the Android tree. Apply
+<a class="l" name="11" href="#11">11</a>		patch to some benchmarks to make them workable to the suite.
+<a class="l" name="12" href="#12">12</a>
+<a class="l" name="13" href="#13">13</a>		2) Apply patch <a href="/9.0.0_r3/s?path=autotest.diff&amp;project=toolchain">autotest.diff</a> to <a href="/9.0.0_r3/s?path=android_root/external/autotest&amp;project=toolchain">android_root/external/autotest</a>,
+<a class="l" name="14" href="#14">14</a>		which includes all the test scripts for benchmarks. Copy
+<a class="l" name="15" href="#15">15</a>		testcases to related autotest directory.
+<a class="l" name="16" href="#16">16</a>
+<a class="l" name="17" href="#17">17</a>	   If you have applied the patch partially or hope to discard all the
+<a class="l" name="18" href="#18">18</a>	   patches, just run ./<a href="/9.0.0_r3/s?path=discard_patches.py&amp;project=toolchain">discard_patches.py</a>
+<a class="l" name="19" href="#19">19</a>
+<a class="hl" name="20" href="#20">20</a>	3. Build and run benchmark on the device using ./<a href="/9.0.0_r3/s?path=run.py.&amp;project=toolchain">run.py.</a> You can either
+<a class="l" name="21" href="#21">21</a>	use test configuration file (-t test_config), or set all the variables
+<a class="l" name="22" href="#22">22</a>	manually.
+<a class="l" name="23" href="#23">23</a>
+<a class="l" name="24" href="#24">24</a>	4. The raw results locate at bench_result_* in bench suite home
+<a class="l" name="25" href="#25">25</a>	directory.
+<a class="l" name="26" href="#26">26</a>
+<a class="l" name="27" href="#27">27</a>	5. The JSON format result will be generated for crosperf report.
+<a class="l" name="28" href="#28">28</a>
+<a class="l" name="29" href="#29">29</a>Utility tools:
+<a class="hl" name="30" href="#30">30</a>	1. Autotest is a test framework located in android <a href="/9.0.0_r3/s?path=exteranl/autotest&amp;project=toolchain">exteranl/autotest</a>
+<a class="l" name="31" href="#31">31</a>		Before first time running it, please run
+<a class="l" name="32" href="#32">32</a>		<a href="/9.0.0_r3/s?path=utils/build_externals.py&amp;project=toolchain">utils/build_externals.py</a> first to ensure all the environments
+<a class="l" name="33" href="#33">33</a>		and tools needed are installed.
+<a class="l" name="34" href="#34">34</a>
+<a class="l" name="35" href="#35">35</a>	2. Crosperf is a report generating tool in ChromeOS toolchain
+<a class="l" name="36" href="#36">36</a>	utilities, which has a mirror at <a href="/9.0.0_r3/s?path=external/toolchain-utils&amp;project=toolchain">external/toolchain-utils</a> in Android
+<a class="l" name="37" href="#37">37</a>	tree.
+<a class="l" name="38" href="#38">38</a></pre>
+</div>
+    <div id="footer">
+<p><a href="http://www.opensolaris.org/os/project/opengrok/"
+ title="Served by OpenGrok"><span id="fti"></span></a></p>
+<p>Indexes created Sun Aug 12 02:23:12 CEST 2018</p>
+    
+    </div>
+    </div>
+</div>
+</body>
+</html>
+
+\IžïÂø      `0ûÂ`0û¨B­¦É`:6'   f    O^partitionKey=%28http%2Candroidxref.com%29,:http://androidxref.com/9.0.0_r3/xref/toolchain/benchmark/ necko:classified 1 strongly-framed 1 request-method GET response-head HTTP/1.1 200 OK
+Server: Apache-Coyote/1.1
+Last-Modified: Fri, 10 Aug 2018 10:52:43 GMT
+Content-Type: text/html;charset=UTF-8
+Date: Sat, 20 Feb 2021 12:08:07 GMT
+ original-response-headers Server: Apache-Coyote/1.1
+Last-Modified: Fri, 10 Aug 2018 10:52:43 GMT
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sat, 20 Feb 2021 12:08:07 GMT
+ ctid 1 uncompressed-len 0 net-response-time-onstart 386 net-response-time-onstop 743   ,
