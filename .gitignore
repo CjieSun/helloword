@@ -1,0 +1,8 @@
+#Ignore directories
+.local/
+.cache/
+.mozilla/
+snap/
+
+#Ignore files
+
